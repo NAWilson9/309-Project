@@ -1,3 +1,6 @@
+server/config.json
+server/connectors/sampleConnector/sample_connector_config.json
+
 *.idea*
 
 # Created by https://www.gitignore.io/api/webstorm,node,windows,osx,linux
