@@ -1,6 +1,7 @@
 //Link dependencies
 var config = require('./config.json');
 var express = require('express');
+var path = require('path');
 var io = require('socket.io')();
 
 //Connectors
@@ -16,7 +17,7 @@ var logging = function (req, res, next) {
 var app = express();
 app.use(logging);
 app.use(sampleConnector); //Todo
-app.use(express.static('../client/', {
+app.use(express.static(path.join(__dirname, '/../', 'client'), {
     extensions: ['html']}));
 
 //Starts the servers
