@@ -3,6 +3,7 @@
 - Nick Wilson
 - Adam Matthews
 - Lyle Lovig
+- Nicholas Boos
 
 ## Project setup
 Steps to get the project up and running.
