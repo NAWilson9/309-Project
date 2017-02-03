@@ -15,11 +15,27 @@
 //     chai.expect(3).to.equal(6);
 // });
 
-var assert = require('assert');
-describe('Array', function() {
-    describe('#indexOf()', function() {
-        it('should return -1 when the value is not present', function() {
-            assert.equal(-1, [1,2,3].indexOf(4));
-        });
+var assert = require('chai').assert;
+var expected, current;
+
+before(function(){
+    expected = ['a', 'b', 'c'];
+});
+
+describe('String#split', function(){
+    beforeEach(function(){
+        current = 'a,b,c'.split(',');
     });
+
+    it('should return an array', function(){
+        assert(Array.isArray(current));
+    });
+
+    it('should return the same array', function(){
+        assert.equal(expected.length, current.length, 'arrays have equal length');
+
+        for (var i=0; i<expected.length; i++) {
+            assert.equal(expected[i], current[i], i + 'element is equal');
+        }
+    })
 });
