@@ -1,20 +1,3 @@
-// var chai = require('chai');
-// var server = require('./server');
-
-// describe("Middleware", function() {
-//     describe("logging", function(){
-//         it('logs incoming Express routes and user IPs to console', function(){
-//             var next = function(){};
-//             var req = {'originalUrl': 'originalUrl', 'ip': 'ip'};
-//             var res = null;
-//
-//             server.
-//         })
-//     });
-//
-//     chai.expect(3).to.equal(6);
-// });
-
 var assert = require('chai').assert;
 var expected, current;
 
@@ -22,7 +5,7 @@ before(function(){
     expected = ['a', 'b', 'c'];
 });
 
-describe('server', function(){
+describe('sampleConnector', function(){
     beforeEach(function(){
         current = 'a,b,c'.split(',');
     });
