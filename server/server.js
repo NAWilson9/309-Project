@@ -8,7 +8,7 @@ var io = require('socket.io')();
 var sampleConnector = require('./connectors/sampleConnector/sampleConnector')(io); //Todo
 
 //Middleware definitions
-var logging = function (req, res, next) {
+var logging = function logging(req, res, next) {
     console.log(new Date().toLocaleTimeString() + ' | Address: "' + req.originalUrl + '" | IP: "' + req.ip + '"');
     next();
 };
