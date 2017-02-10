@@ -4,23 +4,13 @@
     <meta charset="UTF-8">
     <title>CHSS</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.css">
-    <style>
-        body {
-            text-align: center;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.4.2/react-dom.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/4.0.0-2/react-router.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui-react/0.64.5/semantic-ui-react.min.js"></script>
+    <link rel="stylesheet" href="semantic.min.css">
+    <script src="vendor.js"></script>
     <script src="./socket.io/socket.io.js"></script>
-    <script>
-        var socket = io.connect(window.location.origin);
-    </script>
+    <script async="true">var socket = io.connect(window.location.origin);</script>
+    <script async=true src="app.js"></script>
 </head>
 <body>
 <div id="react-app"></div>
-<script src="chss.js"></script>
 </body>
 </html>
