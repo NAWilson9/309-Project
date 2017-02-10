@@ -1,4 +1,5 @@
 //Link dependencies
+var bodyParser = require('body-parser');
 var config = require('./config.json');
 var db_config = require('./connectors/db/db_connector_mongodb_config.json');
 var express = require('express');
@@ -8,7 +9,9 @@ var mongodb = require('mongodb');
 var io = require('socket.io')();
 
 //Connectors
-var sampleConnector = require('./connectors/sampleConnector/sampleConnector')(io); //Todo
+var sampleConnector = require('./connectors/sample/sampleConnector')(io); //Todo
+var userConnector = require('./connectors/user/userConnector')();
+
 
 //Middleware definitions
 var logging = function logging(req, res, next) {
@@ -21,7 +24,9 @@ console.log(path.join(__dirname, 'node_modules/semantic-ui-css/'));
 var app = express();
 app.use(bodyParser.json());
 app.use(logging);
+app.use(bodyParser.json());
 app.use(sampleConnector); //Todo
+app.use(userConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
 app.use(express.static(path.join(__dirname, '/../', 'client'), {
     extensions: ['html']}));
