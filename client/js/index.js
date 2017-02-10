@@ -1,3 +1,4 @@
+import 'semantic-ui-css/semantic.css';
 var React = require('react');
 var ReactDOM = require('react-dom');
 var SemanticUI = require('semantic-ui-react');
