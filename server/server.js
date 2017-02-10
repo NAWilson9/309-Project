@@ -12,11 +12,13 @@ var logging = function logging(req, res, next) {
     console.log(new Date().toLocaleTimeString() + ' | Address: "' + req.originalUrl + '" | IP: "' + req.ip + '"');
     next();
 };
+console.log(path.join(__dirname, 'node_modules/semantic-ui-css/'));
 
 //Middleware bindings
 var app = express();
 app.use(logging);
 app.use(sampleConnector); //Todo
+app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
 app.use(express.static(path.join(__dirname, '/../', 'client'), {
     extensions: ['html']}));
 

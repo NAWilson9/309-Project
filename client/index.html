@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <title>CHSS</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="node_modules/semantic_ui-css/semantic.css">
+    <link rel="stylesheet" href="semantic.min.css">
     <script src="vendor.js"></script>
     <script src="./socket.io/socket.io.js"></script>
-    <script>
-        var socket = io.connect(window.location.origin);
-    </script>
+    <script async="true">var socket = io.connect(window.location.origin);</script>
+    <script async=true src="app.js"></script>
 </head>
 <body>
 <div id="react-app"></div>
-<script src="app.js"></script>
 </body>
 </html>

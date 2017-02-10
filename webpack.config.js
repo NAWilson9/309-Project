@@ -24,23 +24,7 @@ module.exports = {
                 test: /\.jsx?$/,
                 loader: 'babel-loader',
                 include: path.join(__dirname, 'client')
-            },
-            {
-                test: /\.css$/,
-                loader: 'css-loader'
-            },
-            {
-                test: /\.png$/,
-                loader: 'url-loader'
-            },
-            {
-                test: /\.svg$/,
-                loader: 'svg-loader'
-            },
-            {
-                test: /\icons$/,
-                loader: 'icon-loader'
-            },
+            }
         ]
     },
     devtool: (process.env.NODE_ENV === 'production') ? 'nosources-source-map' : 'eval-source-map'
