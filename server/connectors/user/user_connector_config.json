@@ -3,7 +3,8 @@
     "users": [
         {
             "username": "nick",
-            "password": "hype"
+            "password": "hype",
+            "test": "test"
         },
         {
             "username": "lyle",
