@@ -8,8 +8,9 @@ const router = require('express').Router();
 // Deletes the password property from the user object
 // and returns the updated object.
 let userDataHandler = function(user){
-    delete user.password;
-    return user;
+    let updatedUser = Object.assign({}, user);
+    delete updatedUser.password;
+    return updatedUser;
 };
 
 // Handles GET requests to '/api/user/login'
