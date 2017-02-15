@@ -3,14 +3,13 @@ var bodyParser = require('body-parser');
 var config = require('./config.json');
 var db_config = require('./connectors/db/db_connector_mongodb_config.json');
 var express = require('express');
-var bodyParser = require('body-parser');
-var path = require('path');
 var mongodb = require('mongodb');
 var io = require('socket.io')();
+var path = require('path');
 
 //Connectors
 var sampleConnector = require('./connectors/sample/sampleConnector')(io); //Todo
-var userConnector = require('./connectors/user/userConnector')();
+var userConnector = require('./connectors/user/userConnector');
 
 
 //Middleware definitions
@@ -18,7 +17,6 @@ var logging = function logging(req, res, next) {
     console.log(new Date().toLocaleTimeString() + ' | Address: "' + req.originalUrl + '" | IP: "' + req.ip + '"');
     next();
 };
-console.log(path.join(__dirname, 'node_modules/semantic-ui-css/'));
 
 //Middleware bindings
 var app = express();
@@ -28,8 +26,7 @@ app.use(bodyParser.json());
 app.use(sampleConnector); //Todo
 app.use(userConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
-app.use(express.static(path.join(__dirname, '/../', 'client'), {
-    extensions: ['html']}));
+app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['html']}));
 
 //Connect to database
 // mongoose.connect(db_config.host);
