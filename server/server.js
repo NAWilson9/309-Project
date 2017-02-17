@@ -33,5 +33,5 @@ io.on('connection', function (socket) {
 
     socket.on('disconnect', function(){
         console.log(new Date().toLocaleTimeString() + ' | A user has disconnected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
-    })
+    });
 });
