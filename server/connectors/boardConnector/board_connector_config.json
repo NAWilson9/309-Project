@@ -1,0 +1,20 @@
+{
+  "some_key": "turtles",
+  "boards": [
+	{
+		"id": "98324",
+		"creator": "Nick",
+		"name": "bestBoard"
+	},
+	{
+		"id": "45278",
+		"creator": "Tom",
+		"name": "coolBoard"
+	},
+	{
+		"id": "12345",
+		"creator": "Drew",
+		"name": "awesomeBoard"
+	}
+  ]
+}
