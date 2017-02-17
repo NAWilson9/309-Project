@@ -1,0 +1,15 @@
+{
+    "some_key": "Get out",
+    "pieces": [
+        {
+            "id": "11403",
+            "name": "pawnW",
+            "creator": "lyle"
+        },
+        {
+            "id": "11404",
+            "name": "pawnB",
+            "creator": "lyle"
+        }
+    ]
+}
