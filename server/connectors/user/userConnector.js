@@ -30,7 +30,7 @@ router.post(config.base_url + 'login', function (req, res) {
 
     let user = config.users.find((user) => user.username === username && user.password === password);
     if(user){
-        res.send(JSON.stringify(userDataHandler(user)));
+        res.send(userDataHandler(user));
         console.log(new Date().toLocaleTimeString() + ' | User | "' + username + '" successfully authenticated.');
     }
     else {
@@ -87,25 +87,17 @@ router.post(config.base_url + 'profile', function(req, res) {
         res.send('User not found.');
         console.warn(new Date().toLocaleTimeString() + ' | User | "' + username + '" was not found.');
     } else {
+        let oldConfig = JSON.parse(JSON.stringify(config));
         config.users[config.users.indexOf(user)] = req.body;
         fs.writeFile(path.join(__dirname, '/user_connector_config.json'), JSON.stringify(config, null, 4), function(err){
             if(err) {
                 res.statusCode = 500;
                 res.send('Error saving new user data.');
+                config = oldConfig;
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new user data.');
                 console.error(err);
             } else {
-                fs.readFile(path.join(__dirname, '/user_connector_config.json'), function(err, data) {
-                    if (err) {
-                        res.statusCode = 500;
-                        res.send('Error reading newly saved user data');
-                        console.error(new Date().toLocaleTimeString() + ' | Unable to read newly saved user data.');
-                        console.log(err);
-                    } else {
-                        config = JSON.parse(data);
-                        res.send(JSON.stringify(config));
-                    }
-                });
+                res.send(req.body);
             }
         });
     }
