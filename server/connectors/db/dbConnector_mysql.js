@@ -1,12 +1,9 @@
 //Link dependencies
 const mysql = require('mysql');
+const config = require('./db_connector_mysql_config.json');
 
 //Connect to MYSQL Server
-const connection = mysql.createConnection({
-    host     : 'mysql.cs.iastate.edu',
-    user     : 'dbu309sr4',
-    password : 'YjhhN2FjODRh',
-});
+const connection = mysql.createConnection(JSON.parse(config));
 connection.connect((err) => {
     if (err) {
         console.error('Error connecting: ' + err.stack);
