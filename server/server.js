@@ -1,7 +1,10 @@
 //Link dependencies
 var config = require('./config.json');
+var db_config = require('./connectors/db/db_connector_mongodb_config.json');
 var express = require('express');
 var path = require('path');
+var mongodb = require('mongodb');
+// var mongoose = require('mongoose');
 var io = require('socket.io')();
 
 //Connectors
@@ -22,10 +25,22 @@ app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-cs
 app.use(express.static(path.join(__dirname, '/../', 'client'), {
     extensions: ['html']}));
 
+//Connect to database
+// mongoose.connect(db_config.host);
+// console.log(mongoose);
+
 //Starts the servers
-io.listen(app.listen(config.port, function () {
-    console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
-}));
+mongodb.MongoClient.connect(db_config.host)
+    .then((res) => {
+        var dbTest = require('./connectors/db/db_test');
+        app.use(dbTest);
+        io.listen(app.listen(config.port, function () {
+            console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
+        }));
+        console.log('Connected to database:', res.s.databaseName);
+    }, (err) => {
+        console.error('Failure connecting to database', err);
+    });
 
 //Socket routing
 io.on('connection', function (socket) {
