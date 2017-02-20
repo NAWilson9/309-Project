@@ -20,6 +20,7 @@ var logging = function logging(req, res, next) {
 
 //Middleware bindings
 var app = express();
+app.use(bodyParser);
 app.use(logging);
 app.use(bodyParser.json());
 app.use(sampleConnector); //Todo
@@ -39,6 +40,7 @@ mongodb.MongoClient.connect(db_config.host, (err, db) => {
     app.use(dbTest);
 });
 
+//Starts the servers
 io.listen(app.listen(config.port, function () {
     console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
 }));
