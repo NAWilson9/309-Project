@@ -6,7 +6,7 @@ var io = require('socket.io')();
 
 //Connectors
 var sampleConnector = require('./connectors/sampleConnector/sampleConnector')(io); //Todo
-var pieceConnector = require('./connectors/Piece/pieceConnector');
+var pieceConnector = require('./connectors/piece/pieceConnector');
 
 //Middleware definitions
 var logging = function logging(req, res, next) {

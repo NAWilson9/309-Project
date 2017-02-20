@@ -1,36 +1,28 @@
-
 //Link dependencies
 let config = require('./piece_connector_config.json');
 const fs = require('fs');
 const path = require('path');
 const router = require('express').Router();
-
-//Global socket.io object
-var io;
-
-// Helper functions could go here
-
-
 //Routing
-router.get('/api/pieceConnector', function (req, res) {
-    res.send(config.some_key);
-    io.emit(config.some_key)
-});
+/*
+This takes in an id of a piece to update
 
+If the id is found in the file it updates the piece information to the info specified
+
+If the id is not found it creates a new piece with that id and specified info
+ */
 router.post('/api/pieces', function(req, res) {
     let id = req.query.id;
     let name = req.body.name;
     let creator = req.body.creator;
     if(!id){
         res.statusCode = 400;
-        res.send("No id or creator specified!");
+        res.send("No id specified!");
         return;
     }
-
-    let user = config.pieces.find((piece) => piece.id === id);
-    if(user){
-            user.name = name;
-            user.creator = creator;
+    let piece = config.pieces.find((piece) => piece.id === id);
+    if(piece){
+        piece = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
             if(err) {
                 res.statusCode = 500;
@@ -38,15 +30,11 @@ router.post('/api/pieces', function(req, res) {
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new piece data.');
                 console.error(err);
             } else {
-                res.send(config);
+                res.send(piece);
             }
         });
-
-
     }
-
     else {
-
         config.pieces[config.pieces.length] = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
             if(err) {
@@ -55,47 +43,59 @@ router.post('/api/pieces', function(req, res) {
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new piece data.');
                 console.error(err);
             } else {
-                res.send(config);
+                res.send(piece);
             }
         });
-
     }
     });
+/*
+This takes in ids of a piece or a creator of a piece.
 
+If both ids and creator are specified we return an error asking for one or the other
 
+If neither ids or creator are specified we return an error stating so
 
+If ids are specified we look for pieces with the ids specified and return them
+
+If a creator is specified we look for pieces by that creator and return them
+ */
 router.get('/api/pieces', function (req, res) {
-    let id = req.query.id;
-        if(id) {
-            id = id.split(',');
-        }
-
+    let ids = req.query.id;
+    if(ids) {
+        ids = ids.split(',');
+    }
     let creator =  req.query.creator;
-    if(!id && !creator){
+    if(!ids && !creator){
         res.statusCode = 400;
-        res.send("No id or creator specified!");
+        res.send("No ids or creator specified!");
+        return;
+    }
+    if(ids && creator){
+        res.statusCode = 400;
+        res.send("Both ids and creator specified!");
         return;
     }
     let returnPieces = [];
-    console.log("Got here");
-    if(!id){
+    if(creator){
         config.pieces.forEach(function (piece) {
             if(piece.creator==creator){
                 returnPieces.push(piece);
                 console.log("Found one piece");
             }
         });
-        if(returnPieces == []){
+        if(returnPieces.length === 0){
             res.statusCode = 404;
             res.send("creator not found!")
+            return;
         }
         res.send(returnPieces);
     }
-    if(!creator){
+    if(ids){
         config.pieces.forEach(function (piece) {
-            for(var i=0;i < id.length;i++) {
-                if (piece.id == id[i]) {
+            for(var i=0;i < ids.length;i++) {
+                if (piece.id == ids[i]) {
                     returnPieces.push(piece);
+                    return;
                 }
             }
         });
@@ -106,8 +106,4 @@ router.get('/api/pieces', function (req, res) {
         res.send(returnPieces);
     }
 });
-
-module.exports = function (ioObj) {
-    io = ioObj;
-    return router;
-};
+module.exports = router;
