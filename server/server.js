@@ -20,7 +20,6 @@ var logging = function logging(req, res, next) {
 
 //Middleware bindings
 var app = express();
-app.use(bodyParser.json());
 app.use(logging);
 app.use(bodyParser.json());
 app.use(sampleConnector); //Todo
@@ -29,8 +28,6 @@ app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-cs
 app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['html']}));
 
 //Connect to database
-// mongoose.connect(db_config.host);
-// console.log(mongoose);
 mongodb.MongoClient.connect(db_config.host, (err, db) => {
     if (err)
     {
@@ -42,7 +39,6 @@ mongodb.MongoClient.connect(db_config.host, (err, db) => {
     app.use(dbTest);
 });
 
-//Starts the servers
 io.listen(app.listen(config.port, function () {
     console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
 }));
