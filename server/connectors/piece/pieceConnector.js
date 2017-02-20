@@ -13,8 +13,6 @@ If the id is not found it creates a new piece with that id and specified info
  */
 router.post('/api/pieces', function(req, res) {
     let id = req.query.id;
-    let name = req.body.name;
-    let creator = req.body.creator;
     if(!id){
         res.statusCode = 400;
         res.send("No id specified!");
