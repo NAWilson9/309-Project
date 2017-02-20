@@ -1,4 +1,5 @@
 //Link dependencies
+var bodyParser = require('body-parser');
 var config = require('./config.json');
 var express = require('express');
 var path = require('path');
