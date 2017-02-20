@@ -1,25 +1,30 @@
-const db = require('./dbConnector_mongodb');
+let db;
 // const path = require('path');
 const router = require('express').Router();
 
-let user1 = {
-    username: 'Jorge',
-    password: '1234'
-};
-let user2 = {
-    username: 'Alf',
-    password: '1234'
-};
+// let user1 = {
+//     username: 'Jorge',
+//     password: '1234'
+// };
+// let user2 = {
+//     username: 'Alf',
+//     password: '1234'
+// };
 
 router.post('/dbtest', (req, res) => {
-    if (req.body){
+    if (req.body) {
         db.createUser(JSON.parse(req.body));
+        // res.send(req.body);
     }
 });
 
-console.log(db);
+// console.log(db);
 
-module.exports = router;
+module.exports = (database) =>
+{
+    db  = require('./dbConnector_mongodb')(database);
+    return router;
+};
 
 // db.createUser(user1);
 // db.createUser(user2);

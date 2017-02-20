@@ -1,45 +1,49 @@
 //Link dependencies
 // let config = require('./db_connector_mongodb_config.json');
-const mongodb = require('mongodb');
+// const mongodb = require('mongodb');
 
-function Database() {
-    // console.log(mongodb);
-    this.db = mongodb.MongoClient.connection;
-    console.log(mongodb.MongoClient.connection);
-    this.createUser = (user) => {
+// function Database() {
+//     // console.log(mongodb);
+//     console.log(mongodb.MongoClient.connection);
+//     this.createUser = (user) => {
+//         let coll = this.db.collection('users');
+//         coll.insertOne(user)
+//             .then(
+//                 (res) => console.log('Successfully added item:', res.ops),
+//                 (err) => console.error('Error adding item:', err)
+//             );
+//     };
+// }
+let db;
+//
+const dbConnector = {
+    createUser: (user) => {
         let coll = this.db.collection('users');
         coll.insertOne(user)
             .then(
                 (res) => console.log('Successfully added item:', res.ops),
                 (err) => console.error('Error adding item:', err)
             );
-    };
-}
+    },
+    getUser: (username) => {
 
-//
-// const dbConnector = {
-//     d: () => {
-//
-//     },
-//     getUser: (username) => {
-//
-//     },
-//     createPiece: (username, piece) => {
-//
-//     },
-//     getPiece: (id) => {
-//
-//     },
-//     getPiecesForUser: (username) => {
-//
-//     },
-//     createGameboard: (username, gameboard) => {
-//
-//     },
-//     getGameboardForUser: (username) => {
-//
-//     },
-// };
+    },
+    createPiece: (username, piece) => {
+
+    },
+    getPiece: (id) => {
+
+    },
+    getPiecesForUser: (username) => {
+
+    },
+    createGameboard: (username, gameboard) => {
+
+    },
+    getGameboardForUser: (username) => {
+
+    },
+};
 
 
 // mongodb.MongoClient.connect(config.host, (err, db) => {
@@ -55,4 +59,7 @@ function Database() {
 //     dbConnector.database = db;
 // });
 
-module.exports = new Database();
+module.exports = (database) => {
+    db = database;
+    return dbConnector;
+}

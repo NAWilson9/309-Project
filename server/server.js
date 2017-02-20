@@ -2,6 +2,7 @@
 var config = require('./config.json');
 var db_config = require('./connectors/db/db_connector_mongodb_config.json');
 var express = require('express');
+var bodyParser = require('body-parser');
 var path = require('path');
 var mongodb = require('mongodb');
 // var mongoose = require('mongoose');
@@ -19,6 +20,7 @@ console.log(path.join(__dirname, 'node_modules/semantic-ui-css/'));
 
 //Middleware bindings
 var app = express();
+app.use(bodyParser);
 app.use(logging);
 app.use(sampleConnector); //Todo
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
@@ -28,19 +30,21 @@ app.use(express.static(path.join(__dirname, '/../', 'client'), {
 //Connect to database
 // mongoose.connect(db_config.host);
 // console.log(mongoose);
+mongodb.MongoClient.connect(db_config.host, (err, db) => {
+    if (err)
+    {
+        console.error('Failure connecting to database', err);
+        return;
+    }
+    console.log('Connected to database:', db);
+    let dbTest = require('./connectors/db/db_test')(db);
+    app.use(dbTest);
+});
 
 //Starts the servers
-mongodb.MongoClient.connect(db_config.host)
-    .then((res) => {
-        var dbTest = require('./connectors/db/db_test');
-        app.use(dbTest);
-        io.listen(app.listen(config.port, function () {
-            console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
-        }));
-        console.log('Connected to database:', res.s.databaseName);
-    }, (err) => {
-        console.error('Failure connecting to database', err);
-    });
+io.listen(app.listen(config.port, function () {
+    console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
+}));
 
 //Socket routing
 io.on('connection', function (socket) {
