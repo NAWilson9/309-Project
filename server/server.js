@@ -18,6 +18,7 @@ console.log(path.join(__dirname, 'node_modules/semantic-ui-css/'));
 
 //Middleware bindings
 var app = express();
+app.use(bodyParser.json());
 app.use(logging);
 app.use(sampleConnector); //Todo
 app.use(pieceConnector);
