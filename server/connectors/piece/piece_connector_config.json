@@ -1,5 +1,4 @@
 {
-
     "pieces": [
         {
             "id": "11405",
@@ -7,18 +6,8 @@
             "creator": "lyle"
         },
         {
-            "id": "11404",
-            "name": "pawnC",
-            "creator": "lyle"
-        },
-        {
-            "id": "11406",
-            "name": "pawnD",
-            "creator": "lyle"
-        },
-        {
-            "id": "11406",
-            "name": "pawneD",
+            "id": "11409",
+            "name": "pawnW",
             "creator": "lyle"
         }
     ]

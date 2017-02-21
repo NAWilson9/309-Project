@@ -27,12 +27,15 @@ router.post('/api/pieces', function(req, res) {
                 res.send('Error saving new piece data.');
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new piece data.');
                 console.error(err);
+                return;
             } else {
                 res.send(piece);
+                return;
             }
         });
     }
     else {
+        //TODO if se
         config.pieces[config.pieces.length] = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
             if(err) {
