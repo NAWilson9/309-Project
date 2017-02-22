@@ -5,10 +5,12 @@ const path = require('path');
 const router = require('express').Router();
 //Routing
 /*
+Handles post requests to /api/pieces
+Expects one parameter
+- id: int
+
 This takes in an id of a piece to update
-
 If the id is found in the file it updates the piece information to the info specified
-
 If the id is not found it creates a new piece with that id and specified info
  */
 router.post('/api/pieces', function(req, res) {
@@ -20,7 +22,7 @@ router.post('/api/pieces', function(req, res) {
     }
     let piece = config.pieces.find((piece) => piece.id === id);
     if(piece){
-        piece = req.body;
+        config.pieces[config.pieces.indexOf(piece)] = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
             if(err) {
                 res.statusCode = 500;
@@ -35,7 +37,6 @@ router.post('/api/pieces', function(req, res) {
         });
     }
     else {
-        //TODO if se
         config.pieces[config.pieces.length] = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
             if(err) {
@@ -50,14 +51,15 @@ router.post('/api/pieces', function(req, res) {
     }
     });
 /*
+Handles get requests to /api/pieces
+Expects two parameters
+- ids: array of ints
+- creator: string
+
 This takes in ids of a piece or a creator of a piece.
-
 If both ids and creator are specified we return an error asking for one or the other
-
 If neither ids or creator are specified we return an error stating so
-
 If ids are specified we look for pieces with the ids specified and return them
-
 If a creator is specified we look for pieces by that creator and return them
  */
 router.get('/api/pieces', function (req, res) {
@@ -81,7 +83,6 @@ router.get('/api/pieces', function (req, res) {
         config.pieces.forEach(function (piece) {
             if(piece.creator==creator){
                 returnPieces.push(piece);
-                console.log("Found one piece");
             }
         });
         if(returnPieces.length === 0){
@@ -100,7 +101,7 @@ router.get('/api/pieces', function (req, res) {
                 }
             }
         });
-        if(returnPieces == []){
+        if(returnPieces.length === 0){
             res.statusCode = 404;
             res.send("id/s not found!")
         }

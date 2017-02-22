@@ -2,7 +2,7 @@
     "pieces": [
         {
             "id": "11405",
-            "name": "pawnD",
+            "name": "pawnB",
             "creator": "lyle"
         },
         {
@@ -10,5 +10,4 @@
             "name": "pawnW",
             "creator": "lyle"
         }
-    ]
 }
