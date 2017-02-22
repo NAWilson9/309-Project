@@ -15,17 +15,18 @@ If the id is not found it creates a new piece with that id and specified info
  */
 router.post('/api/pieces', function(req, res) {
     let id = req.query.id;
+
     if(!id){
         res.statusCode = 400;
         res.send("No id specified!");
         return;
     }
-    let piece = config.pieces.find((piece) => piece.id === id);
-    if(req.body == null){
+    if(Object.keys(req.body).length() === 0 ){
         res.statusCode = 400;
         res.send("No body specified!");
         return;
     }
+    let piece = config.pieces.find((piece) => piece.id === id);
     if(piece){
         config.pieces[config.pieces.indexOf(piece)] = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
