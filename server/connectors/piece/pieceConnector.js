@@ -21,6 +21,11 @@ router.post('/api/pieces', function(req, res) {
         return;
     }
     let piece = config.pieces.find((piece) => piece.id === id);
+    if(req.body == null){
+        res.statusCode = 400;
+        res.send("No body specified!");
+        return;
+    }
     if(piece){
         config.pieces[config.pieces.indexOf(piece)] = req.body;
         fs.writeFile(path.join(__dirname, '/piece_connector_config.json'), JSON.stringify(config, null, 4), function(err){
