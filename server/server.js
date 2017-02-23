@@ -5,7 +5,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
 var mongodb = require('mongodb');
-// var mongoose = require('mongoose');
 var io = require('socket.io')();
 
 //Connectors
@@ -20,7 +19,7 @@ console.log(path.join(__dirname, 'node_modules/semantic-ui-css/'));
 
 //Middleware bindings
 var app = express();
-app.use(bodyParser);
+app.use(bodyParser.json());
 app.use(logging);
 app.use(sampleConnector); //Todo
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));

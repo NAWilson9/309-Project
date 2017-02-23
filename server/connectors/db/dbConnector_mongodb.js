@@ -14,22 +14,37 @@
 //             );
 //     };
 // }
+
 let db;
-//
 const dbConnector = {
     createUser: (user) => {
-        let coll = this.db.collection('users');
+        let coll = db.collection('users');
         coll.insertOne(user)
             .then(
-                (res) => console.log('Successfully added item:', res.ops),
+                (res) => console.log('Successfully added item:', JSON.stringify(res.ops, undefined, 2)),
                 (err) => console.error('Error adding item:', err)
             );
     },
-    getUser: (username) => {
-
+    getUser: (username, callback) => {
+        let coll = db.collection('users');
+        coll.findOne({username: username})
+            .then(
+                (res) => {
+                    console.log('What');
+                    callback(res);
+                }, (err) => {
+                    console.error('Error finding item:', err);
+                    callback(err);
+                }
+            );
     },
-    createPiece: (username, piece) => {
-
+    createPiece: (piece) => {
+        let coll = db.collection('pieces');
+        coll.insertOne(piece)
+            .then(
+                (res) => console.log('Successfully added item:', JSON.stringify(res.ops, undefined, 2)),
+                (err) => console.error('Error adding item:', err)
+            );
     },
     getPiece: (id) => {
 
@@ -45,21 +60,7 @@ const dbConnector = {
     },
 };
 
-
-// mongodb.MongoClient.connect(config.host, (err, db) => {
-//     if (err) console.error('Error connecting to database:', err);
-//     else {
-//         this.database = db;
-//         callback();
-//     }
-// });
-
-// mongodb.MongoClient.connect(config.host, (err, db) => {
-//     if (err) return console.error('Error connecting to database:', err);
-//     dbConnector.database = db;
-// });
-
 module.exports = (database) => {
     db = database;
     return dbConnector;
-}
+};
