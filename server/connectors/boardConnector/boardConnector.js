@@ -5,31 +5,26 @@ const router = require('express').Router();
 const fs = require('fs');
 const path = require('path');
 
-//Global socket.io object
-var io;
-
-// Helper functions could go here
 
 //Routing
-router.get('/api/boardConnector', function (req, res) {
-    res.send(config.some_key);
-    io.emit(config.some_key)
-});
 
+/*
+Post request to api/boards
+Takes a board id to update
+*/
 router.post('api/boards', function (req, res){
 	let id = req.query.id;
-	let name = req.body.name;
-	let creator = req.body.creator;
+	
 	if(!id){
 		res.statusCode = 404;
 		res.send("No id or creator specified!");
 		return;
 	}
 	
-	let user = config.boards.find((board) => board.id === id);
-	if(user){
-		user.name = name;
-		user.creator = creator;
+	let board = config.boards.find((board) => board.id === id);
+	
+	if(board){
+		config.boards[config.boards.indexOf(board)] = req.body;
 		fs.writepath(path.join(__dirname, 'board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
 			if(err){
 				res.statusCode = 500;
@@ -38,10 +33,12 @@ router.post('api/boards', function (req, res){
 				console.error(err);
 			}
 			else{
-				res.send(config);
+				res.send(board);
+				return;
 			}
 		});
 	}
+	
 	else{
 		config.boards[config.boards.length] = req.body;
 		fs.writepath(path.join(__dirname, 'board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
@@ -52,26 +49,52 @@ router.post('api/boards', function (req, res){
 				console.error(err);
 			}	
 			else{
-				res.send(config);
+				res.send(board);
 			}
 			
 		});
 	}
 });
-
+/*
+Get requests to api/boards
+Takes an id of a board or creator to get
+*/
 router.get('/api/boards', function(req, res){
+	
 	let id = req.query.id;
+	
 	if(id){
 		id = id.split(',');
 	}
+	
 	let creator = req.query.creator;
+	
 	if(!id && !creator){
 		res.statusCode = 404;
 		res.send("No id or creator specified!");
 		return;
 	}
+	
 	let returnBoards = [];
-	if(!id){
+	
+	if(creator){
+		
+        config.boards.forEach(function (board) {
+            if(board.creator==creator){
+                returnBoards.push(board);
+            }
+        });
+		
+        if(returnBoards.length === 0){
+            res.statusCode = 404;
+            res.send("Creator not found!")
+            return;
+        }
+		
+        res.send(returnBoards);
+    }
+	
+	if(id){
 		config.boards.forEach(function (board){
 			for(var i = 0; i < id.length; i++){
 				if(piece.id == id[i]){
@@ -79,15 +102,14 @@ router.get('/api/boards', function(req, res){
 				}
 			}
 		});
-		if(returnBoards == []){
+		
+		if(returnBoards.length === 0){
 			res.statusCode = 404;
 			res.send("No board id/s found");
 		}
+		
 		res.send(returnBoards);
 	}			
 });
 
-module.exports = function (ioObj) {
-    io = ioObj;
-    return router;
-};
+module.exports = router;
