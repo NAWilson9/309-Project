@@ -20,7 +20,6 @@ var logging = function logging(req, res, next) {
 
 //Middleware bindings
 var app = express();
-app.use(bodyParser);
 app.use(logging);
 app.use(bodyParser.json());
 app.use(sampleConnector); //Todo
