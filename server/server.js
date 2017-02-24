@@ -33,7 +33,7 @@ mongodb.MongoClient.connect(db_config.host, (err, db) => {
         console.error('Failure connecting to database', err);
         return;
     }
-    console.log('Connected to database:', db);
+    console.log('Connected to database:', db.s.databaseName);
     let dbTest = require('./connectors/db/db_test')(db);
     app.use(dbTest);
 });

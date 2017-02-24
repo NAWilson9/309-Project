@@ -1,3 +1,18 @@
 {
-  "host"     : "mongodb://localhost:27017/chssdb"
+  "host"     : "mongodb://localhost:27017/chssdb",
+  "object_format_user":
+  {
+    "username": "string",
+    "password": "string"
+  },
+  "object_format_piece":
+  {
+    "name": "string",
+    "creator": "string"
+  },
+  "object_format_board":
+  {
+    "name": "string",
+    "creator": "string"
+  }
 }

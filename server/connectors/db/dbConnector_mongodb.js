@@ -15,42 +15,69 @@
 //     };
 // }
 
+const Joi = require('joi');
+
+const userSchema = Joi.object().keys({
+    username: Joi.string(),
+    password: Joi.string()
+});
+
+const pieceSchema = Joi.object().keys({
+    name: Joi.string(),
+    creator: Joi.string()
+});
+
+const boardSchema = Joi.object().keys({
+    name: Joi.string(),
+    creator: Joi.string()
+});
+
 let db;
 const dbConnector = {
-    createUser: (user) => {
-        let coll = db.collection('users');
-        coll.insertOne(user)
-            .then(
-                (res) => console.log('Successfully added item:', JSON.stringify(res.ops, undefined, 2)),
-                (err) => console.error('Error adding item:', err)
-            );
+    createUser: (user, callback) => {
+        if (user)
+        {
+            let coll = db.collection('users');
+            coll.insertOne(user)
+                .then(
+                    (res) => callback(undefined, res.ops[0]),
+                    (err) => callback(err)
+                );
+        }
     },
     getUser: (username, callback) => {
         let coll = db.collection('users');
         coll.findOne({username: username})
             .then(
-                (res) => {
-                    console.log('What');
-                    callback(res);
-                }, (err) => {
-                    console.error('Error finding item:', err);
-                    callback(err);
-                }
+                (res) => callback(undefined, res),
+                (err) => callback(err)
             );
     },
     createPiece: (piece) => {
         let coll = db.collection('pieces');
         coll.insertOne(piece)
             .then(
-                (res) => console.log('Successfully added item:', JSON.stringify(res.ops, undefined, 2)),
+                (res) => console.log('Successfully added piece:', JSON.stringify(res.ops, undefined, 2)),
                 (err) => console.error('Error adding item:', err)
             );
     },
-    getPiece: (id) => {
-
+    getPiece: (id, callback) => {
+        let coll = db.collection('pieces');
+        coll.findOne({id: id})
+            .then(
+                (res) => callback(undefined, res),
+                (err) => callback(err)
+            );
     },
-    getPiecesForUser: (username) => {
-
+    getPiecesForUser: (username, callback) => {
+        let coll = db.collection('pieces');
+        coll.find({creator: username})
+            .toArray(
+                (err) => (err) => callback(err))
+            .then(
+                (res) => callback(undefined, res),
+                (err) => callback(err)
+            );
     },
     createGameboard: (username, gameboard) => {
 
