@@ -93,7 +93,7 @@ router.get('/api/pieces', function (req, res) {
         });
         if(returnPieces.length === 0){
             res.statusCode = 404;
-            res.send("creator not found!")
+            res.send("creator not found!");
             return;
         }
         res.send(returnPieces);
@@ -110,6 +110,7 @@ router.get('/api/pieces', function (req, res) {
         if(returnPieces.length === 0){
             res.statusCode = 404;
             res.send("id/s not found!")
+            return;
         }
         res.send(returnPieces);
     }
