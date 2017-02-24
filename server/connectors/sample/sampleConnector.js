@@ -9,7 +9,7 @@ var io;
 // Helper functions could go here
 
 //Routing
-router.get('/api/sampleConnector', function (req, res) {
+router.get('/api/sample', function (req, res) {
     res.send(config.some_key);
     io.emit(config.some_key)
 });
