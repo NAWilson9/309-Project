@@ -106,7 +106,7 @@ router.get('/api/boards', function(req, res){
 		
         if(returnBoards.length === 0){
             res.statusCode = 404;
-            res.send("Creator not found!")
+            res.send("Creator not found!");
             return;
         }
 		
