@@ -1,0 +1,14 @@
+{
+    "base_url": "/api/user/",
+    "users": [
+        {
+            "username": "nick",
+            "password": "hype",
+            "test": "test"
+        },
+        {
+            "username": "lyle",
+            "password": "123"
+        }
+    ]
+}
