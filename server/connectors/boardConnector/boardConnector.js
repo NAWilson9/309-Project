@@ -10,14 +10,23 @@ const path = require('path');
 
 /*
 Post request to api/boards
-Takes a board id to update
+Takes an int id from query body
+id of board to update
+Updates board information specified if id is found
+Creates new board id with info if id not found
 */
-router.post('api/boards', function (req, res){
-	let id = req.query.id;
+router.post('/api/boards', function (req, res){
+	let id = req.body.id;
 	
 	if(!id){
 		res.statusCode = 404;
-		res.send("No id or creator specified!");
+		res.send("No id specified!");
+		return;
+	}
+	
+	if(Object.keys(req.body).length === 0){
+		res.statusCode = 404;
+		res.send("No body specified!");
 		return;
 	}
 	
@@ -25,7 +34,7 @@ router.post('api/boards', function (req, res){
 	
 	if(board){
 		config.boards[config.boards.indexOf(board)] = req.body;
-		fs.writepath(path.join(__dirname, 'board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
+		fs.writeFile(path.join(__dirname, '/board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
 			if(err){
 				res.statusCode = 500;
 				res.send('Error while saving board data');
@@ -41,7 +50,7 @@ router.post('api/boards', function (req, res){
 	
 	else{
 		config.boards[config.boards.length] = req.body;
-		fs.writepath(path.join(__dirname, 'board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
+		fs.writeFile(path.join(__dirname, '/board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
 			if(err){
 				res.statusCode = 500;
 				res.send('Error while saving board data');
@@ -49,7 +58,8 @@ router.post('api/boards', function (req, res){
 				console.error(err);
 			}	
 			else{
-				res.send(board);
+				res.send(config.boards[config.boards.length - 1]);
+				return;
 			}
 			
 		});
@@ -57,7 +67,11 @@ router.post('api/boards', function (req, res){
 });
 /*
 Get requests to api/boards
-Takes an id of a board or creator to get
+Takes an array of int ids and creator string
+If both id and creator are not specified an error is returned
+If both id and creator are specified an error is returned
+If ids are specified we look for boards with the ids to return
+If a creator is specified the boards from the creator are returned
 */
 router.get('/api/boards', function(req, res){
 	
@@ -75,15 +89,20 @@ router.get('/api/boards', function(req, res){
 		return;
 	}
 	
+	if(id && creator){
+		res.statusCode = 400;
+		res.send("Both id and creator specified");
+		return;
+	}
+	
 	let returnBoards = [];
 	
 	if(creator){
-		
         config.boards.forEach(function (board) {
-            if(board.creator==creator){
-                returnBoards.push(board);
-            }
-        });
+        if(board.creator==creator){
+            returnBoards.push(board);
+        }
+    });
 		
         if(returnBoards.length === 0){
             res.statusCode = 404;
@@ -97,8 +116,9 @@ router.get('/api/boards', function(req, res){
 	if(id){
 		config.boards.forEach(function (board){
 			for(var i = 0; i < id.length; i++){
-				if(piece.id == id[i]){
+				if(board.id == id[i]){
 					returnBoards.push(board);
+					return;
 				}
 			}
 		});
@@ -106,6 +126,7 @@ router.get('/api/boards', function(req, res){
 		if(returnBoards.length === 0){
 			res.statusCode = 404;
 			res.send("No board id/s found");
+			return;
 		}
 		
 		res.send(returnBoards);

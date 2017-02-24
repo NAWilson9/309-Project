@@ -1,6 +1,6 @@
 
 //Link dependencies
-var config = require('./sample_connector_config_template.json');
+var config = require('./sample_connector_config.json');
 var router = require('express').Router();
 
 //Global socket.io object
