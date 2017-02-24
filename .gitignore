@@ -1,7 +1,5 @@
 client/app.js*
 client/vendor.js*
-server/config.json
-server/connectors/sampleConnector/sample_connector_config.json
 
 *.idea*
 
