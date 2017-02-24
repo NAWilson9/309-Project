@@ -7,7 +7,7 @@ var io = require('socket.io')();
 
 //Connectors
 var sampleConnector = require('./connectors/sampleConnector/sampleConnector')(io); //Todo
-
+var userConnector = require('./connectors/user/userConnector');
 var pieceConnector = require('./connectors/piece/pieceConnector');
 
 //Middleware definitions
@@ -22,7 +22,7 @@ var app = express();
 app.use(bodyParser.json());
 app.use(logging);
 app.use(sampleConnector); //Todo
-
+app.use(userConnector);
 app.use(pieceConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
 app.use(express.static(path.join(__dirname, '/../', 'client'), {
