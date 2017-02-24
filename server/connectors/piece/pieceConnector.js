@@ -21,7 +21,7 @@ router.post('/api/pieces', function(req, res) {
         res.send("No id specified!");
         return;
     }
-    if(Object.keys(req.body).length() === 0 ){
+    if(Object.keys(req.body).length === 0 ){
         res.statusCode = 400;
         res.send("No body specified!");
         return;
@@ -51,7 +51,8 @@ router.post('/api/pieces', function(req, res) {
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new piece data.');
                 console.error(err);
             } else {
-                res.send(piece);
+                res.send(config.pieces[config.pieces.length-1]);
+                return;
             }
         });
     }
@@ -109,7 +110,7 @@ router.get('/api/pieces', function (req, res) {
         });
         if(returnPieces.length === 0){
             res.statusCode = 404;
-            res.send("id/s not found!")
+            res.send("id/s not found!");
             return;
         }
         res.send(returnPieces);
