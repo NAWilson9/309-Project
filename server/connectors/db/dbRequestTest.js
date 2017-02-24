@@ -53,6 +53,6 @@ router.get('/dbtest/piece', (req, res) => {
 });
 
 module.exports = (database) => {
-    db  = require('./dbConnector_mongodb')(database);
+    db  = require('./dbConnector')(database);
     return router;
 };

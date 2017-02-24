@@ -1,7 +1,7 @@
 //Link dependencies
 var bodyParser = require('body-parser');
 var config = require('./config.json');
-var db_config = require('./connectors/db/db_connector_mongodb_config.json');
+var db_config = require('./connectors/db/db_connector_config.json');
 var express = require('express');
 var mongodb = require('mongodb');
 var io = require('socket.io')();

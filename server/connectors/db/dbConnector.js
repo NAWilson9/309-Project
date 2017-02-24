@@ -1,5 +1,5 @@
 //Link dependencies
-// let config = require('./db_connector_mongodb_config.json');
+// let config = require('./db_connector_config.json');
 // const mongodb = require('mongodb');
 
 // function Database() {

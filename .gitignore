@@ -3,6 +3,9 @@ client/vendor.js*
 
 *.idea*
 
+/server/connectors/db/db_connector_mysql_config.json
+/server/connectors/db/dbConnector_mysql.js
+
 # Created by https://www.gitignore.io/api/webstorm,node,windows,osx,linux
 ## File-based project format:
 *.iws
