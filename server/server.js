@@ -29,8 +29,7 @@ app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['ht
 
 //Connect to database
 mongodb.MongoClient.connect(db_config.host, (err, db) => {
-    if (err)
-    {
+    if (err) {
         console.error('Failure connecting to database', err);
         return;
     }
