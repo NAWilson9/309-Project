@@ -37,7 +37,7 @@ router.post('/api/pieces', function(req, res) {
                 console.error(err);
                 return;
             } else {
-                res.send(piece);
+                res.send(config.pieces.find((piece) => piece.id === id));
                 return;
             }
         });
