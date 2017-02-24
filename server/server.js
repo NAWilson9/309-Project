@@ -36,7 +36,7 @@ mongodb.MongoClient.connect(db_config.host, (err, db) => {
         return;
     }
     console.log('Connected to database:', db.s.databaseName);
-    let dbTest = require('./connectors/db/db_test')(db);
+    let dbTest = require('./connectors/db/dbRequestTest')(db);
     app.use(dbTest);
 });
 
