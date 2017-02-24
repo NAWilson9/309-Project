@@ -7,14 +7,14 @@ const router = require('express').Router();
 /*
 Handles post requests to /api/pieces
 Expects one parameter
-- id: int
+- id: int (specified in the query body)
 
 This takes in an id of a piece to update
 If the id is found in the file it updates the piece information to the info specified
 If the id is not found it creates a new piece with that id and specified info
  */
 router.post('/api/pieces', function(req, res) {
-    let id = req.query.id;
+    let id = req.body.id;
 
     if(!id){
         res.statusCode = 400;

@@ -6,7 +6,7 @@ var io = require('socket.io')();
 var path = require('path');
 
 //Connectors
-var sampleConnector = require('./connectors/sampleConnector/sampleConnector')(io); //Todo
+var sampleConnector = require('./connectors/sample/sampleConnector')(io); //Todo
 var userConnector = require('./connectors/user/userConnector');
 var pieceConnector = require('./connectors/piece/pieceConnector');
 
