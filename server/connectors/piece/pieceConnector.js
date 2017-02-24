@@ -108,7 +108,7 @@ router.get('/api/pieces', function (req, res) {
                 }
             }
         });
-        if(returnPieces.length === 0){
+        if(returnPieces.length === 0 || returnPieces.length != ids.length){
             res.statusCode = 404;
             res.send("id/s not found!");
             return;
