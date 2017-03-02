@@ -42,7 +42,7 @@ router.post('/api/boards', function (req, res){
 				console.error(err);
 			}
 			else{
-				res.send(board);
+				res.send(config.boards.find((board) => board.id === id));
 				return;
 			}
 		});
@@ -123,9 +123,9 @@ router.get('/api/boards', function(req, res){
 			}
 		});
 		
-		if(returnBoards.length === 0){
+		if(returnBoards.length === 0 || returnBoards.length != id.length){
 			res.statusCode = 404;
-			res.send("No board id/s found");
+			res.send("Board id/s not found");
 			return;
 		}
 		
