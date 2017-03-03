@@ -17,21 +17,17 @@ Creates new board id with info if id not found
 */
 router.post('/api/boards', function (req, res){
 	let id = req.body.id;
-	
 	if(!id){
 		res.statusCode = 404;
 		res.send("No id specified!");
 		return;
 	}
-	
 	if(Object.keys(req.body).length === 0){
 		res.statusCode = 404;
 		res.send("No body specified!");
 		return;
 	}
-	
 	let board = config.boards.find((board) => board.id === id);
-	
 	if(board){
 		config.boards[config.boards.indexOf(board)] = req.body;
 		fs.writeFile(path.join(__dirname, '/board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
@@ -47,7 +43,6 @@ router.post('/api/boards', function (req, res){
 			}
 		});
 	}
-	
 	else{
 		config.boards[config.boards.length] = req.body;
 		fs.writeFile(path.join(__dirname, '/board_connector_config.json'), JSON.stringify(config, null, 4), function(err){
@@ -61,7 +56,6 @@ router.post('/api/boards', function (req, res){
 				res.send(config.boards[config.boards.length - 1]);
 				return;
 			}
-			
 		});
 	}
 });
@@ -74,45 +68,35 @@ If ids are specified we look for boards with the ids to return
 If a creator is specified the boards from the creator are returned
 */
 router.get('/api/boards', function(req, res){
-	
 	let id = req.query.id;
-	
 	if(id){
 		id = id.split(',');
 	}
-	
 	let creator = req.query.creator;
-	
 	if(!id && !creator){
 		res.statusCode = 404;
 		res.send("No id or creator specified!");
 		return;
 	}
-	
 	if(id && creator){
 		res.statusCode = 400;
 		res.send("Both id and creator specified");
 		return;
 	}
-	
 	let returnBoards = [];
-	
 	if(creator){
         config.boards.forEach(function (board) {
         if(board.creator==creator){
             returnBoards.push(board);
         }
     });
-		
         if(returnBoards.length === 0){
             res.statusCode = 404;
             res.send("Creator not found!");
             return;
         }
-		
         res.send(returnBoards);
     }
-	
 	if(id){
 		config.boards.forEach(function (board){
 			for(var i = 0; i < id.length; i++){
@@ -122,15 +106,12 @@ router.get('/api/boards', function(req, res){
 				}
 			}
 		});
-		
 		if(returnBoards.length === 0 || returnBoards.length != id.length){
 			res.statusCode = 404;
 			res.send("Board id/s not found");
 			return;
 		}
-		
 		res.send(returnBoards);
 	}			
 });
-
 module.exports = router;
