@@ -50,7 +50,7 @@ router.post('/dbtest/piece', (req, res) => {
 });
 router.get('/dbtest/piece', (req, res) => {
     let userID = req.query.userID;
-    let id = req.query.id;
+    let ID = req.query.ID;
     if (userID){
         db.getPiecesByUserID(userID, (err, pieces) => {
             if (err) {
@@ -62,13 +62,14 @@ router.get('/dbtest/piece', (req, res) => {
             }
         });
     }
-    if (id) {
-        db.getPieceByID(id, (piece) => {
-            if (piece) {
-                res.send(piece);
-            } else {
+    if (ID) {
+        db.getPieceByID(ID, (err, piece) => {
+            if (err) {
+                console.error(err);
                 res.statusCode = 404;
                 res.send('Piece not found');
+            } else {
+                res.send(piece);
             }
         });
     }

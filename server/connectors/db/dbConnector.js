@@ -3,28 +3,42 @@ const mongodb = require('mongodb');
 const Joi = require('joi');
 const ObjectID = mongodb.ObjectID;
 
-const userSchema = Joi.object().keys({
-    username: Joi.string().required(),
-    password: Joi.string().required(),
-    _id: Joi.string().optional(),
-});
-
-const pieceSchema = Joi.object().keys({
-    name: Joi.string().required(),
-    userID: Joi.string().required(),
-    _id: Joi.string().optional(),
-});
-
-const gameboardSchema = Joi.object().keys({
-    name: Joi.string().required(),
-    userID: Joi.string().required(),
-    _id: Joi.string().optional(),
-});
-
+let db;
+const collNames = {
+    user: 'users',
+    piece: 'pieces',
+    gameboard:  'gameboards',
+};
+const schemas = {
+    user: Joi.object().keys({
+        username: Joi.string().required(),
+        password: Joi.string().required(),
+        _id: Joi.string().optional(),
+    }),
+    piece: Joi.object().keys({
+        name: Joi.string().required(),
+        userID: Joi.string().required(),
+        _id: Joi.string().optional(),
+    }),
+    gameboard: Joi.object().keys({
+        name: Joi.string().required(),
+        userID: Joi.string().required(),
+        _id: Joi.string().optional(),
+    }),
+};
 const dbRespond = (callback, err, res) => {
     if (callback) {
         callback(err, res);
     }
+};
+
+const errMsg = {
+    noEntryData: 'No entry data specified',
+    noQueryData: 'No query data specified',
+    improperEntryFormat: 'Improper entry format - ',
+    improperIDFormat: 'Improper ID format',
+    noID: 'Must specify item ID',
+    collCreation: 'Error creating collection',
 };
 
 /**
@@ -44,8 +58,8 @@ const dbRespond = (callback, err, res) => {
  */
 const createItem = (item, itemSchema, collectionName, callback) => {
     const validation = Joi.validate(item, itemSchema);
-    if (!item) dbRespond(callback, 'No entry data specified');
-    else if (validation.error) dbRespond(callback, 'Improper entry format\n' + validation.error);
+    if (!item) dbRespond(callback, errMsg.noEntryData);
+    else if (validation.error) dbRespond(callback, errMsg.improperEntryFormat + validation.error);
     else
     {
         let coll = db.collection(collectionName);
@@ -61,8 +75,10 @@ const createItem = (item, itemSchema, collectionName, callback) => {
  * Retrieves a item with the given key value pair from database
  * @param keyValuePair
  * Key value pair by which to search for item to retrieve from database
- * Also must contain 'value' property with value equivalent to key value pair's value for definition check
+ * For definition check, must also contain 'value' property with value equivalent to surrounding function's caller's query value
  * 'value' property is deleted after check if value is defined
+ * @param collectionName
+ * Collection that contains item
  * @param callback
  * Called with error or result upon Promise return from database operation
  * @res
@@ -74,14 +90,29 @@ const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
     if (keyValuePair.value)
     {
         delete keyValuePair.value;
+        if (keyValuePair.hasOwnProperty(IDKey)) {
+            if (ObjectID.isValid(keyValuePair[IDKey])) keyValuePair[IDKey] = ObjectID(keyValuePair[IDKey]);
+            else {
+                dbRespond(callback, errMsg.improperIDFormat);
+                return;
+            }
+        }
         let coll = db.collection(collectionName);
         coll.findOne(keyValuePair)
             .then(
                 (res) => dbRespond(callback, undefined, res),
                 (err) => dbRespond(callback, err)
             );
-    } else dbRespond(callback, 'No query data specified');
+    } else dbRespond(callback, errMsg.noQueryData);
 };
+const createKeyValuePair = (key, value) => {
+    let keyValuePair = {};
+    keyValuePair[key] = value;
+    keyValuePair.value = value;
+    return keyValuePair;
+};
+const usernameKey = 'username';
+const IDKey = '_id';
 
 /**
  * Retrieves all of the items created by the User with the given userID from given collection
@@ -94,21 +125,19 @@ const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
  * @res
  * Array of items if found, undefined if not
  * @err
- * Array creation error or Database query error
+ * Database query error
  */
 const getItemsByUserID = (userID, collectionName, callback) => {
     if (userID)
     {
         let coll = db.collection(collectionName);
-        // console.log(coll.find());
-        console.log(userID);
         coll.find({userID: userID})
-            .toArray((err) => dbRespond(callback, err))
+            .toArray()
             .then(
                 (res) => dbRespond(callback, undefined, res),
                 (err) => dbRespond(callback, err)
             );
-    } else dbRespond(callback, 'No query data specified');
+    } else dbRespond(callback, errMsg.noQueryData);
 };
 
 /**
@@ -128,14 +157,19 @@ const getItemsByUserID = (userID, collectionName, callback) => {
  * No entry data specified, Improper entry format + validation error, or database replacement error
  */
 const updateItem = (item, itemSchema, collectionName, callback) => {
-    const validation = Joi.validate(item, userSchema);
-    if (!item) dbRespond(callback, 'No entry data specified');
-    else if (validation.error) dbRespond(callback, 'Improper entry format\n' + validation.error);
+    const validation = Joi.validate(item, itemSchema);
+    if (!item) dbRespond(callback, errMsg.noEntryData);
+    else if (!item._id) dbRespond(callback, errMsg.noID);
+    else if (validation.error) dbRespond(callback, errMsg.improperEntryFormat + validation.error);
     else
     {
         let coll = db.collection(collectionName);
         let newItem = Object.assign({}, item);
-        newItem._id = ObjectID(item._id);
+        if (ObjectID.isValid(newItem._id)) newItem._id = ObjectID(item._id);
+        else {
+            dbRespond(callback, errMsg.improperIDFormat);
+            return;
+        }
         coll.findOneAndReplace({ _id: newItem._id }, newItem, { returnOriginal: false })
             .then(
                 (res) => dbRespond(callback, undefined, res.value),
@@ -144,50 +178,77 @@ const updateItem = (item, itemSchema, collectionName, callback) => {
     }
 };
 
+const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
+    if (keyValuePair.value)
+    {
+        delete keyValuePair.value;
+        if (keyValuePair.hasOwnProperty(IDKey)) {
+            if (ObjectID.isValid(keyValuePair[IDKey])) keyValuePair[IDKey] = ObjectID(keyValuePair[IDKey]);
+            else {
+                dbRespond(callback, errMsg.improperIDFormat);
+                return;
+            }
+        }
+        let coll = db.collection(collectionName);
+        coll.deleteOne(keyValuePair)
+            .then(
+                (res) => dbRespond(callback, undefined, res),
+                (err) => dbRespond(callback, err)
+            );
+    } else dbRespond(callback, errMsg.noQueryData);
+};
 
-let db;
+
 const dbConnector = {
     createUser: (user, callback) => {
-        createItem(user, userSchema, 'users', callback);
+        createItem(user, schemas.user, collNames.user, callback);
     },
     getUserByUsername: (username, callback) => {
-        const keyValuePair = { username: username, value: username };
-        getItemByKeyValue(keyValuePair, 'users', callback);
+        getItemByKeyValue(createKeyValuePair(usernameKey, username), collNames.user, callback);
+    },
+    getUserByID: (userID, callback) => {
+        getItemByKeyValue(createKeyValuePair(IDKey, userID), collNames.user, callback);
     },
     updateUser: (user, callback) => {
-        updateItem(user, userSchema, 'users', callback);
+        updateItem(user, schemas.user, collNames.user, callback);
     },
+
     createPiece: (piece, callback) => {
-        createItem(piece, pieceSchema, 'pieces', callback);
+        createItem(piece, schemas.piece, collNames.piece, callback);
     },
     getPieceByID: (pieceID, callback) => {
-        const ID = ObjectID(pieceID);
-        const keyValuePair = { _id: ID, value: ID };
-        getItemByKeyValue(keyValuePair, 'pieces', callback);
+        getItemByKeyValue(createKeyValuePair(IDKey, pieceID), collNames.piece, callback);
     },
     getPiecesByUserID: (userID, callback) => {
-        getItemsByUserID(userID, 'pieces', callback);
+        getItemsByUserID(userID, collNames.piece, callback);
     },
     updatePiece: (piece, callback) => {
-        updateItem(piece, pieceSchema, 'pieces', callback);
+        updateItem(piece, schemas.piece, collNames.piece, callback);
     },
+
     createGameboard: (gameboard, callback) => {
-        createItem(gameboard, gameboardSchema, 'gameboards', callback);
+        createItem(gameboard, schemas.gameboard, collNames.gameboard, callback);
     },
     getGameboardByID: (gameboardID, callback) => {
-        const ID = ObjectID(gameboardID);
-        const keyValuePair = { _id: ID, value: ID };
-        getItemByKeyValue(keyValuePair, 'gameboards', callback);
+        getItemByKeyValue(createKeyValuePair(IDKey, gameboardID), collNames.gameboard, callback);
     },
     getGameboardsByUserID: (userID, callback) => {
-        getItemsByUserID(userID, 'gameboards', callback);
+        getItemsByUserID(userID, collNames.gameboard, callback);
     },
     updateGameboard: (gameboard, callback) => {
-        updateItem(gameboard, gameboardSchema, 'gameboards', callback);
+        updateItem(gameboard, schemas.gameboard, collNames.gameboard, callback);
     },
 };
 
 module.exports = (database) => {
     db = database;
+    db.listCollections().toArray().then((res) => {
+        let names = [];
+        res.forEach((coll) => names.push(coll.name));
+        Object.keys(collNames).forEach((collNameKey) => {
+            if (!names.includes(collNames[collNameKey]))
+                db.createCollection(collNames[collNameKey]).catch((err) => console.error(errMsg.collCreation));
+        });
+    }, (err) => {});
     return dbConnector;
 };
