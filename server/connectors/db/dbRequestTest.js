@@ -14,7 +14,7 @@ router.post('/dbtest/user', (req, res) => {
     }
 });
 router.get('/dbtest/user', (req, res) => {
-    db.getUser(req.query.username, (err, user) => {
+    db.getUserByUsername(req.query.username, (err, user) => {
         if (err) {
             console.error(err);
             res.statusCode = 500;
@@ -25,6 +25,16 @@ router.get('/dbtest/user', (req, res) => {
             res.statusCode = 404;
             res.send('User not found');
         }
+    });
+});
+router.post('/dbtest/updateUser', (req, res) => {
+    db.updateUser(req.body, (err, user) => {
+        if (err) {
+            console.error(err);
+            res.statusCode = 500;
+            res.send('Database error');
+        }
+        else res.send(user);
     });
 });
 router.post('/dbtest/piece', (req, res) => {
@@ -39,20 +49,21 @@ router.post('/dbtest/piece', (req, res) => {
     }
 });
 router.get('/dbtest/piece', (req, res) => {
-    let username = req.query.username;
+    let userID = req.query.userID;
     let id = req.query.id;
-    if (username){
-        db.getPiecesForUser(username, (pieces) => {
-            if (pieces) {
-                res.send(pieces);
-            } else {
+    if (userID){
+        db.getPiecesByUserID(userID, (err, pieces) => {
+            if (err) {
+                console.error(err);
                 res.statusCode = 404;
                 res.send('Piece not found');
+            } else {
+                res.send(pieces);
             }
         });
     }
     if (id) {
-        db.getPiece(id, (piece) => {
+        db.getPieceByID(id, (piece) => {
             if (piece) {
                 res.send(piece);
             } else {
@@ -64,6 +75,6 @@ router.get('/dbtest/piece', (req, res) => {
 });
 
 module.exports = (database) => {
-    db  = require('./dbConnector')(database);
+    db = require('./dbConnector')(database);
     return router;
 };

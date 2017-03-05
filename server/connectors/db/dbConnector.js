@@ -1,166 +1,189 @@
 //Link dependencies
-// let config = require('./db_connector_config.json');
 const mongodb = require('mongodb');
-
-// function Database() {
-//     // console.log(mongodb);
-//     console.log(mongodb.MongoClient.connection);
-//     this.createUser = (user) => {
-//         let coll = this.db.collection('users');
-//         coll.insertOne(user)
-//             .then(
-//                 (res) => console.log('Successfully added item:', res.ops),
-//                 (err) => console.error('Error adding item:', err)
-//             );
-//     };
-// }
-
 const Joi = require('joi');
+const ObjectID = mongodb.ObjectID;
 
 const userSchema = Joi.object().keys({
     username: Joi.string().required(),
-    password: Joi.string().required()
+    password: Joi.string().required(),
+    _id: Joi.string().optional(),
 });
 
 const pieceSchema = Joi.object().keys({
     name: Joi.string().required(),
-    creator: Joi.string().required()
+    userID: Joi.string().required(),
+    _id: Joi.string().optional(),
 });
 
-const boardSchema = Joi.object().keys({
+const gameboardSchema = Joi.object().keys({
     name: Joi.string().required(),
-    creator: Joi.string().required()
+    userID: Joi.string().required(),
+    _id: Joi.string().optional(),
 });
+
+const dbRespond = (callback, err, res) => {
+    if (callback) {
+        callback(err, res);
+    }
+};
+
+/**
+ * Adds a given valid item to given collection
+ * @param item
+ * Object to insert into database
+ * @param itemSchema
+ * Schema to use in item format validation
+ * @param collectionName
+ * Collection that contains item
+ * @param callback
+ * Called with error or result upon Promise return from database operation
+ * @res
+ * Object inserted into database
+ * @err
+ * No entry data specified, Improper entry format + validation error, or database insertion error
+ */
+const createItem = (item, itemSchema, collectionName, callback) => {
+    const validation = Joi.validate(item, itemSchema);
+    if (!item) dbRespond(callback, 'No entry data specified');
+    else if (validation.error) dbRespond(callback, 'Improper entry format\n' + validation.error);
+    else
+    {
+        let coll = db.collection(collectionName);
+        coll.insertOne(item)
+            .then(
+                (res) => dbRespond(callback, undefined, res.ops[0]),
+                (err) => dbRespond(callback, err)
+            );
+    }
+};
+
+/**
+ * Retrieves a item with the given key value pair from database
+ * @param keyValuePair
+ * Key value pair by which to search for item to retrieve from database
+ * Also must contain 'value' property with value equivalent to key value pair's value for definition check
+ * 'value' property is deleted after check if value is defined
+ * @param callback
+ * Called with error or result upon Promise return from database operation
+ * @res
+ * Item if found, undefined if not
+ * @err
+ * Database query error
+ */
+const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
+    if (keyValuePair.value)
+    {
+        delete keyValuePair.value;
+        let coll = db.collection(collectionName);
+        coll.findOne(keyValuePair)
+            .then(
+                (res) => dbRespond(callback, undefined, res),
+                (err) => dbRespond(callback, err)
+            );
+    } else dbRespond(callback, 'No query data specified');
+};
+
+/**
+ * Retrieves all of the items created by the User with the given userID from given collection
+ * @param userID
+ * ID of user that created items to retrieve from database
+ * @param collectionName
+ * Collection that contains items
+ * @param callback
+ * Called with error or result upon Promise return from database operation
+ * @res
+ * Array of items if found, undefined if not
+ * @err
+ * Array creation error or Database query error
+ */
+const getItemsByUserID = (userID, collectionName, callback) => {
+    if (userID)
+    {
+        let coll = db.collection(collectionName);
+        // console.log(coll.find());
+        console.log(userID);
+        coll.find({userID: userID})
+            .toArray((err) => dbRespond(callback, err))
+            .then(
+                (res) => dbRespond(callback, undefined, res),
+                (err) => dbRespond(callback, err)
+            );
+    } else dbRespond(callback, 'No query data specified');
+};
+
+/**
+ * Replaces item's current database entry with given item
+ * Matches entry by ID, therefore item must have property "_id" with proper value
+ * @param item
+ * Item to become new entry
+ * @param itemSchema
+ * Schema to use in item format validation
+ * @param collectionName
+ * Collection that contains item
+ * @param callback
+ * Called with error or result upon Promise return from database operation
+ * @res
+ * Updated item if successful, null if not
+ * @err
+ * No entry data specified, Improper entry format + validation error, or database replacement error
+ */
+const updateItem = (item, itemSchema, collectionName, callback) => {
+    const validation = Joi.validate(item, userSchema);
+    if (!item) dbRespond(callback, 'No entry data specified');
+    else if (validation.error) dbRespond(callback, 'Improper entry format\n' + validation.error);
+    else
+    {
+        let coll = db.collection(collectionName);
+        let newItem = Object.assign({}, item);
+        newItem._id = ObjectID(item._id);
+        coll.findOneAndReplace({ _id: newItem._id }, newItem, { returnOriginal: false })
+            .then(
+                (res) => dbRespond(callback, undefined, res.value),
+                (err) => dbRespond(callback, err)
+            );
+    }
+};
+
 
 let db;
 const dbConnector = {
-    /**
-     * Adds a given valid User object to database
-     * @param user
-     * User object to insert into database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
     createUser: (user, callback) => {
-        let validation = Joi.validate(user, userSchema); //
-        if (user)
-        {
-            let coll = db.collection('users');
-            coll.insertOne(user)
-                .then(
-                    (res) => { if (callback) callback(undefined, res.ops[0]) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+        createItem(user, userSchema, 'users', callback);
     },
-    /**
-     * Retrieves a desired User object from database
-     * @param username
-     * Username of User object to retrieve from database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
-    getUser: (username, callback) => {
-        if (username)
-        {
-            let coll = db.collection('users');
-            coll.findOne({username: username})
-                .then(
-                    (res) => { if (callback) callback(undefined, res) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+    getUserByUsername: (username, callback) => {
+        const keyValuePair = { username: username, value: username };
+        getItemByKeyValue(keyValuePair, 'users', callback);
     },
-    /**
-     * Adds a given valid Piece object to database
-     * @param piece
-     * Piece object to insert into database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
+    updateUser: (user, callback) => {
+        updateItem(user, userSchema, 'users', callback);
+    },
     createPiece: (piece, callback) => {
-        if (piece)
-        {
-            let coll = db.collection('pieces');
-            coll.insertOne(piece)
-                .then(
-                    (res) => { if (callback) callback(undefined, res.ops[0]) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+        createItem(piece, pieceSchema, 'pieces', callback);
     },
-    /**
-     * Retrieves a desired Piece object from database
-     * @param id
-     * ID of Piece object to retrieve from database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
-    getPiece: (id, callback) => {
-        if (id)
-        {
-            let coll = db.collection('pieces');
-            coll.findOne({id: id})
-                .then(
-                    (res) => { if (callback) callback(undefined, res) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+    getPieceByID: (pieceID, callback) => {
+        const ID = ObjectID(pieceID);
+        const keyValuePair = { _id: ID, value: ID };
+        getItemByKeyValue(keyValuePair, 'pieces', callback);
     },
-    /**
-     * Retrieves all of the Piece objects created by a given User from database
-     * @param username
-     * User that created Piece object to retrieve from database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
-    getPiecesForUser: (username, callback) => {
-        if (username)
-        {
-            let coll = db.collection('pieces');
-            coll.find({creator: username})
-                .toArray((err) => { if (callback) callback(err) })
-                .then(
-                    (res) => { if (callback) callback(undefined, res) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+    getPiecesByUserID: (userID, callback) => {
+        getItemsByUserID(userID, 'pieces', callback);
     },
-    /**
-     * Adds a given valid Gameboard object to database
-     * @param gameboard
-     * Gameboard object to insert into database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
+    updatePiece: (piece, callback) => {
+        updateItem(piece, pieceSchema, 'pieces', callback);
+    },
     createGameboard: (gameboard, callback) => {
-        if (gameboard)
-        {
-            let coll = db.collection('gameboards');
-            coll.insertOne(gameboard)
-                .then(
-                    (res) => { if (callback) callback(undefined, res.ops[0]) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+        createItem(gameboard, gameboardSchema, 'gameboards', callback);
     },
-    /**
-     * Retrieves the Gameboard object of a given User from database
-     * @param username
-     * User that created Gameboard object to retrieve from database
-     * @param callback
-     * Called with error or result upon Promise return from database operation
-     */
-    getGameboardForUser: (username, callback) => {
-        if (username)
-        {
-            let coll = db.collection('gameboards');
-            coll.findOne({creator: username})
-                .then(
-                    (res) => { if (callback) callback(undefined, res) },
-                    (err) => { if (callback) callback(err) }
-                );
-        }
+    getGameboardByID: (gameboardID, callback) => {
+        const ID = ObjectID(gameboardID);
+        const keyValuePair = { _id: ID, value: ID };
+        getItemByKeyValue(keyValuePair, 'gameboards', callback);
+    },
+    getGameboardsByUserID: (userID, callback) => {
+        getItemsByUserID(userID, 'gameboards', callback);
+    },
+    updateGameboard: (gameboard, callback) => {
+        updateItem(gameboard, gameboardSchema, 'gameboards', callback);
     },
 };
 
