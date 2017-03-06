@@ -9,19 +9,26 @@ router.post('/dbtest/user', (req, res) => {
                 console.error(err);
                 res.statusCode = 500;
                 res.send('Error saving user data');
-            } else res.send(user);
+            } else {
+                console.log(user);
+                res.send(user);
+            }
         });
     }
 });
 router.get('/dbtest/user', (req, res) => {
-    db.getUserByUsername(req.query.username, (err, user) => {
+    db.getUserByID(req.query.ID, (err, user) => {
         if (err) {
             console.error(err);
             res.statusCode = 500;
             res.send('Database error');
         }
-        else if (user) res.send(user);
+        else if (user) {
+            console.log(user);
+            res.send(user);
+        }
         else {
+            console.log(user);
             res.statusCode = 404;
             res.send('User not found');
         }
@@ -34,7 +41,23 @@ router.post('/dbtest/updateUser', (req, res) => {
             res.statusCode = 500;
             res.send('Database error');
         }
-        else res.send(user);
+        else {
+            console.log(user);
+            res.send(user);
+        }
+    });
+});
+router.get('/dbtest/deleteUser', (req, res) => {
+    db.deleteUserByID(req.query.ID, (err, user) => {
+        if (err) {
+            console.error(err);
+            res.statusCode = 500;
+            res.send('Database error');
+        }
+        else {
+            console.log(user);
+            res.send(user);
+        }
     });
 });
 router.post('/dbtest/piece', (req, res) => {
@@ -51,13 +74,14 @@ router.post('/dbtest/piece', (req, res) => {
 router.get('/dbtest/piece', (req, res) => {
     let userID = req.query.userID;
     let ID = req.query.ID;
-    if (userID){
+    if (userID) {
         db.getPiecesByUserID(userID, (err, pieces) => {
             if (err) {
                 console.error(err);
                 res.statusCode = 404;
                 res.send('Piece not found');
             } else {
+                console.log(pieces);
                 res.send(pieces);
             }
         });
