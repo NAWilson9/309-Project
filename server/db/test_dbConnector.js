@@ -5,7 +5,7 @@ before(function(){
     expected = ['a', 'b', 'c'];
 });
 
-describe('dbConnector', function(){
+describe('dbapi', function(){
     beforeEach(function(){
         current = 'a,b,c'.split(',');
     });

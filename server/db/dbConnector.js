@@ -4,6 +4,10 @@ const Joi = require('joi');
 const ObjectID = mongodb.ObjectID;
 
 let db;
+
+/**
+ * Database collection names
+ */
 const dbCollNames = {
     user: 'users',
     piece: 'pieces',
@@ -32,7 +36,7 @@ const dbSchemas = {
 };
 
 /**
- * Helper Function
+ * Helper Function for response to API user
  * Calls callback function with error and response if callback provided
  * @param callback
  * @param err
@@ -44,13 +48,18 @@ const dbRespond = (callback, err, res) => {
     }
 };
 
+/**
+ * Error messages
+ */
 const dbErrMsg = {
     noEntryData: 'No entry data specified',
     noQueryData: 'No query data specified',
     improperEntryFormat: 'Improper entry format - ',
     improperIDFormat: 'Improper ID format',
     noID: 'Must specify item ID',
-    collCreation: 'Error creating collection',
+    collCreation: 'Error creating collection:',
+    collList: 'Error listing collections:',
+    connect: 'Failure connecting to database',
 };
 
 /**
@@ -239,8 +248,11 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
     } else dbRespond(callback, dbErrMsg.noQueryData);
 };
 
-
-const dbConnector = {
+/**
+ * Basic CRUD functions exported in module
+ * They utilize the above generic functions
+ */
+const dbapi = {
     createUser: (user, callback) => {
         createItem(user, dbSchemas.user, dbCollNames.user, callback);
     },
@@ -290,17 +302,52 @@ const dbConnector = {
     },
 };
 
-module.exports = (database) => {
-    db = database;
-    // Create any Database Collections not present
-    db.dropCollection("gameboards");
-    db.listCollections().toArray().then((res) => {
-        let names = [];
-        res.forEach((coll) => names.push(coll.name));
-        Object.keys(dbCollNames).forEach((collNameKey) => {
-            if (!names.includes(dbCollNames[collNameKey]))
-                db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation));
+const connect = {
+    /**
+     * Call to connect to database. If connection fails, connection will be attempted again every 5 seconds.
+     * @param app
+     * @param host
+     * Database host
+     * @param dependentModules
+     * Array of modules functions to be called with the database object as a parameter
+     */
+    connect: function (app, host, dependentModules) {
+        mongodb.MongoClient.connect(host, (err, db) => {
+            if (err) {
+                console.error(dbErrMsg.connect);
+                setTimeout(() => {
+                    this.connect(app, host, dependentModules);
+                }, 5000);
+                return;
+            }
+            console.log(new Date().toLocaleTimeString() + ' | Connected to database:', db.s.databaseName);
+            for (let moduleIndex in dependentModules) {
+                app.use(dependentModules[moduleIndex](db));
+            }
         });
-    }, (err) => {});
-    return dbConnector;
+    },
+};
+
+/**
+ * Module exports
+ * @param database
+ * Database object for connection
+ * @return
+ * Data operations if database is defined. Otherwise connection operations.
+ */
+module.exports = (database) => {
+    if (database) {
+        db = database;
+        // Create any Database Collections not present
+        db.listCollections().toArray().then((res) => {
+            let names = [];
+            res.forEach((coll) => names.push(coll.name));
+            Object.keys(dbCollNames).forEach((collNameKey) => {
+                if (!names.includes(dbCollNames[collNameKey]))
+                    db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation, err));
+            });
+        }, (err) => console.error(dbErrMsg.collList, err));
+        return dbapi;
+    }
+    else return connect;
 };

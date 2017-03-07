@@ -24,6 +24,7 @@ router.get('/dbtest/user', (req, res) => {
             res.send('Database error');
         }
         else if (user) {
+            console.log(db);
             console.log(user);
             res.send(user);
         }

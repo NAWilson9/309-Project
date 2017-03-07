@@ -1,42 +1,41 @@
 //Link dependencies
-var bodyParser = require('body-parser');
-var config = require('./config.json');
-var db_config = require('./connectors/db/db_connector_config.json');
-var express = require('express');
-var mongodb = require('mongodb');
-var io = require('socket.io')();
-var path = require('path');
+const bodyParser = require('body-parser');
+const config = require('./config.json');
+const db_config = require('./db/db_connector_config.json');
+const express = require('express');
+const mongodb = require('mongodb');
+const db = require('./db/dbConnector.js')(undefined);
+const io = require('socket.io')();
+const path = require('path');
 
 //Connectors
-var userConnector = require('./connectors/user/userConnector');
-var pieceConnector = require('./connectors/piece/pieceConnector');
+const userConnector = require('./connectors/user/userConnector');
+const pieceConnector = require('./connectors/piece/pieceConnector');
+const dbTest = require('./db/dbRequestTest.js');
 
 //Middleware definitions
-var logging = function logging(req, res, next) {
+const logging = function logging(req, res, next) {
     console.log(new Date().toLocaleTimeString() + ' | Address: "' + req.originalUrl + '" | IP: "' + req.ip + '"');
     next();
 };
 
 //Middleware bindings
-var app = express();
+const app = express();
 app.use(bodyParser.json());
 app.use(logging);
-app.use(bodyParser.json());
 app.use(userConnector);
 app.use(pieceConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
 app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['html']}));
 
 //Connect to database
-mongodb.MongoClient.connect(db_config.host, (err, db) => {
-    if (err) {
-        console.error('Failure connecting to database', err);
-        return;
-    }
-    console.log(new Date().toLocaleTimeString() + ' | Connected to database:', db.s.databaseName);
-    let dbTest = require('./connectors/db/dbRequestTest')(db);
-    app.use(dbTest);
-});
+db.connect(app, db_config.host, [
+    //Place database dependent modules (as uncalled function) in here
+    // example:
+    // userConnector,
+    // pieceConnector,
+    // gameboardConnector,
+]);
 
 //Starts the servers
 io.listen(app.listen(config.port, function () {
