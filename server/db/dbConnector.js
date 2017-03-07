@@ -16,16 +16,28 @@ const dbCollNames = {
 
 /**
  * Item Schemas for Joi input validation
+ * See docs at https://github.com/hapijs/joi/blob/master/API.md
+ * Database items must have these formats
+ * Whenever standard format changes in development, these must be updated
+ * Note: piece.abilities for now is any object, but its internal schema will be defined at a later time
  */
 const dbSchemas = {
     user: Joi.object().keys({
         username: Joi.string().required(),
         password: Joi.string().required(),
+        rating: Joi.number().integer().required(),
+        wins: Joi.number().integer().required(),
+        losses: Joi.number().integer().required(),
+        draws: Joi.number().integer().required(),
+        friends: Joi.array().items(
+            Joi.string()
+        ).required(),
         _id: Joi.string().optional(),
     }),
     piece: Joi.object().keys({
         name: Joi.string().required(),
         userID: Joi.string().required(),
+        abilities: Joi.object().required(),
         _id: Joi.string().optional(),
     }),
     gameboard: Joi.object().keys({
@@ -33,6 +45,22 @@ const dbSchemas = {
         userID: Joi.string().required(),
         _id: Joi.string().optional(),
     }),
+};
+
+/**
+ * Global validation function
+ * @param item
+ * Item to validate
+ * @param itemSchema
+ * Schema to validate against
+ * @return
+ * Joi.validate() result
+ */
+const validate = (item, itemSchema) => {
+    return Joi.validate(item, itemSchema, {
+        // Will not cast types (string => number)
+        convert: false,
+    });
 };
 
 /**
@@ -78,7 +106,7 @@ const dbErrMsg = {
  * No entry data specified, Improper entry format + validation error, Database error, or Undefined if no error
  */
 const createItem = (item, itemSchema, collectionName, callback) => {
-    const validation = Joi.validate(item, itemSchema);
+    const validation = validate(item, itemSchema);
     if (!item) dbRespond(callback, dbErrMsg.noEntryData);
     else if (validation.error) dbRespond(callback, dbErrMsg.improperEntryFormat + validation.error);
     else
@@ -191,7 +219,7 @@ const getItemsByUserID = (userID, collectionName, callback) => {
  * No entry data specified, No ID specified, Improper entry format + validation error, Database error, or Undefined if no error
  */
 const updateItem = (item, itemSchema, collectionName, callback) => {
-    const validation = Joi.validate(item, itemSchema);
+    const validation = validate(item, itemSchema);
     if (!item) dbRespond(callback, dbErrMsg.noEntryData);
     else if (!item._id) dbRespond(callback, dbErrMsg.noID);
     else if (validation.error) dbRespond(callback, dbErrMsg.improperEntryFormat + validation.error);
@@ -239,7 +267,6 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
             }
         }
         let coll = db.collection(collectionName);
-        console.log(keyValuePair);
         coll.findOneAndDelete(keyValuePair)
             .then(
                 (res) => dbRespond(callback, undefined, res.value),
@@ -249,7 +276,7 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
 };
 
 /**
- * Basic CRUD functions exported in module
+ * Basic CRUD functions
  * They utilize the above generic functions
  */
 const dbapi = {
@@ -302,6 +329,9 @@ const dbapi = {
     },
 };
 
+/**
+ * Connection functions
+ */
 const connect = {
     /**
      * Call to connect to database. If connection fails, connection will be attempted again every 5 seconds.

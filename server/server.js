@@ -11,7 +11,6 @@ const path = require('path');
 //Connectors
 const userConnector = require('./connectors/user/userConnector');
 const pieceConnector = require('./connectors/piece/pieceConnector');
-const dbTest = require('./db/dbRequestTest.js');
 
 //Middleware definitions
 const logging = function logging(req, res, next) {
@@ -35,6 +34,7 @@ db.connect(app, db_config.host, [
     // userConnector,
     // pieceConnector,
     // gameboardConnector,
+
 ]);
 
 //Starts the servers
