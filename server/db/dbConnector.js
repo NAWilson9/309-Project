@@ -1,3 +1,8 @@
+/**
+ * CHSS Database Access Module
+ * @module dbConnector
+ */
+
 //Link dependencies
 const mongodb = require('mongodb');
 const Joi = require('joi');
@@ -7,6 +12,7 @@ let db;
 
 /**
  * Database collection names
+ * @private
  */
 const dbCollNames = {
     user: 'users',
@@ -20,6 +26,7 @@ const dbCollNames = {
  * Database items must have these formats
  * Whenever standard format changes in development, these must be updated
  * Note: piece.abilities for now is any object, but its internal schema will be defined at a later time
+ * @private
  */
 const dbSchemas = {
     user: Joi.object().keys({
@@ -49,12 +56,10 @@ const dbSchemas = {
 
 /**
  * Global validation function
- * @param item
- * Item to validate
- * @param itemSchema
- * Schema to validate against
- * @return
- * Joi.validate() result
+ * @private
+ * @param item Item to validate
+ * @param itemSchema Schema to validate against
+ * @return Joi.validate() result
  */
 const validate = (item, itemSchema) => {
     return Joi.validate(item, itemSchema, {
@@ -66,6 +71,7 @@ const validate = (item, itemSchema) => {
 /**
  * Helper Function for response to API user
  * Calls callback function with error and response if callback provided
+ * @private
  * @param callback
  * @param err
  * @param res
@@ -78,6 +84,7 @@ const dbRespond = (callback, err, res) => {
 
 /**
  * Error messages
+ * @private
  */
 const dbErrMsg = {
     noEntryData: 'No entry data specified',
@@ -92,18 +99,13 @@ const dbErrMsg = {
 
 /**
  * Adds a given valid item to given collection
- * @param item
- * Object to insert into database
- * @param itemSchema
- * Schema to use in item format validation
- * @param collectionName
- * Collection that contains item
- * @param callback
- * Called with error or result upon Promise return from database operation
- * @res
- * Item inserted into database or undefined if error
- * @err
- * No entry data specified, Improper entry format + validation error, Database error, or Undefined if no error
+ * @private
+ * @param item Object to insert into database
+ * @param itemSchema Schema to use in item format validation
+ * @param collectionName Collection that contains item
+ * @param callback Called with error or result upon Promise return from database operation
+ * @res Item inserted into database or undefined if error
+ * @err No entry data specified, Improper entry format + validation error, Database error, or Undefined if no error
  */
 const createItem = (item, itemSchema, collectionName, callback) => {
     const validation = validate(item, itemSchema);
@@ -122,18 +124,15 @@ const createItem = (item, itemSchema, collectionName, callback) => {
 
 /**
  * Retrieves a item with the given key value pair from database
+ * @private
  * @param keyValuePair
  * Key value pair by which to search for item to retrieve from database
  * For definition check, must also contain 'value' property with value equivalent to surrounding function's caller's query value
  * 'value' property is deleted after check if value is defined
- * @param collectionName
- * Collection that contains item
- * @param callback
- * Called with error or result upon Promise return from database operation
- * @res
- * Item if found, null if not, undefined if error
- * @err
- * Database error, Improper ID format, or Undefined if no error
+ * @param collectionName Collection that contains item
+ * @param callback Called with error or result upon Promise return from database operation
+ * @res Item if found, null if not, undefined if error
+ * @err Database error, Improper ID format, or Undefined if no error
  */
 const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
     if (keyValuePair.value)
@@ -157,14 +156,10 @@ const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
 /**
  * Helper Function
  * Creates object formatted for input to getItemByKeyValue()
+ * @private
  * @param key
  * @param value
- * @return
- * Properly formatted object
- *  {
- *      key: value,
- *      value: value
- *  }
+ * @return Properly formatted object
  */
 const createKeyValuePair = (key, value) => {
     let keyValuePair = {};
@@ -178,16 +173,12 @@ const IDKey = '_id';
 
 /**
  * Retrieves all of the items created by the User with the given userID from given collection
- * @param userID
- * ID of user that created items to retrieve from database
- * @param collectionName
- * Collection that contains items
- * @param callback
- * Called with error or result upon Promise return from database operation
- * @res
- * Array of items found (empty array if none found) or undefined if error
- * @err
- * Database error, Undefined if no error
+ * @private
+ * @param userID ID of user that created items to retrieve from database
+ * @param collectionName Collection that contains items
+ * @param callback Called with error or result upon Promise return from database operation
+ * @res Array of items found (empty array if none found) or undefined if error
+ * @err Database error, Undefined if no error
  */
 const getItemsByUserID = (userID, collectionName, callback) => {
     if (userID)
@@ -205,18 +196,13 @@ const getItemsByUserID = (userID, collectionName, callback) => {
 /**
  * Replaces item's current database entry with given item
  * Matches entry by ID, therefore item must have property "_id" with proper value
- * @param item
- * Item to become new entry
- * @param itemSchema
- * Schema to use in item format validation
- * @param collectionName
- * Collection that contains item
- * @param callback
- * Called with error or result upon Promise return from database operation
- * @res
- * Updated item if original item found, null if not found, undefined if error
- * @err
- * No entry data specified, No ID specified, Improper entry format + validation error, Database error, or Undefined if no error
+ * @private
+ * @param item Item to become new entry
+ * @param itemSchema Schema to use in item format validation
+ * @param collectionName Collection that contains item
+ * @param callback Called with error or result upon Promise return from database operation
+ * @res Updated item if original item found, null if not found, undefined if error
+ * @err No entry data specified, No ID specified, Improper entry format + validation error, Database error, or Undefined if no error
  */
 const updateItem = (item, itemSchema, collectionName, callback) => {
     const validation = validate(item, itemSchema);
@@ -242,18 +228,15 @@ const updateItem = (item, itemSchema, collectionName, callback) => {
 
 /**
  * Deletes an item with the given key value pair from database
+ * @private
  * @param keyValuePair
  * Key value pair by which to search for item to delete from database
  * For definition check, must also contain 'value' property with value equivalent to surrounding function's caller's query value
  * 'value' property is deleted after check if value is defined
- * @param collectionName
- * Collection that contains item
- * @param callback
- * Called with error or result upon Promise return from database operation
- * @res
- * Deleted item if found and deleted, null if not found, undefined if error
- * @err
- * Database error, Improper ID format, Undefined if no error
+ * @param collectionName Collection that contains item
+ * @param callback Called with error or result upon Promise return from database operation
+ * @res Deleted item if found and deleted, null if not found, undefined if error
+ * @err Database error, Improper ID format, Undefined if no error
  */
 const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
     if (keyValuePair.value)
@@ -275,71 +258,154 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
     } else dbRespond(callback, dbErrMsg.noQueryData);
 };
 
-/**
- * Basic CRUD functions
- * They utilize the above generic functions
- */
-const dbapi = {
+const dataAccess = {
+    /**
+     * Create new User item in database
+     * Calls {@link module:dbConnector~createItem}
+     * @memberOf module:dbConnector
+     * @param user User item
+     * @param callback
+     */
     createUser: (user, callback) => {
         createItem(user, dbSchemas.user, dbCollNames.user, callback);
     },
-    getUserByUsername: (username, callback) => {
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param username
+     * @param callback
+     */
+     getUserByUsername: (username, callback) => {
         getItemByKeyValue(createKeyValuePair(usernameKey, username), dbCollNames.user, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param userID
+     * @param callback
+     */
     getUserByID: (userID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param user
+     * @param callback
+     */
     updateUser: (user, callback) => {
         updateItem(user, dbSchemas.user, dbCollNames.user, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param userID
+     * @param callback
+     */
     deleteUserByID: (userID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
     },
 
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param piece
+     * @param callback
+     */
     createPiece: (piece, callback) => {
         createItem(piece, dbSchemas.piece, dbCollNames.piece, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param pieceID
+     * @param callback
+     */
     getPieceByID: (pieceID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, pieceID), dbCollNames.piece, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param userID
+     * @param callback
+     */
     getPiecesByUserID: (userID, callback) => {
         getItemsByUserID(userID, dbCollNames.piece, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param piece
+     * @param callback
+     */
     updatePiece: (piece, callback) => {
         updateItem(piece, dbSchemas.piece, dbCollNames.piece, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param pieceID
+     * @param callback
+     */
     deletePieceByID: (pieceID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, pieceID), dbCollNames.piece, callback);
     },
 
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gameboard
+     * @param callback
+     */
     createGameboard: (gameboard, callback) => {
         createItem(gameboard, dbSchemas.gameboard, dbCollNames.gameboard, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gameboardID
+     * @param callback
+     */
     getGameboardByID: (gameboardID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, gameboardID), dbCollNames.gameboard, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param userID
+     * @param callback
+     */
     getGameboardsByUserID: (userID, callback) => {
         getItemsByUserID(userID, dbCollNames.gameboard, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gameboard
+     * @param callback
+     */
     updateGameboard: (gameboard, callback) => {
         updateItem(gameboard, dbSchemas.gameboard, dbCollNames.gameboard, callback);
     },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gameboardID
+     * @param callback
+     */
     deleteGameboardByID: (gameboardID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, gameboardID), dbCollNames.gameboard, callback);
     },
 };
 
-/**
- * Connection functions
- */
-const connect = {
+const connection = {
     /**
      * Call to connect to database. If connection fails, connection will be attempted again every 5 seconds.
-     * @param app
-     * @param host
-     * Database host
-     * @param dependentModules
-     * Array of modules functions to be called with the database object as a parameter
+     * @memberOf module:dbConnector
+     * @param app Express app that will use database dependent modules
+     * @param host Database host address
+     * @param dependentModules Array of modules functions to be called with the database object as a parameter
      */
     connect: function (app, host, dependentModules) {
         mongodb.MongoClient.connect(host, (err, db) => {
@@ -359,11 +425,10 @@ const connect = {
 };
 
 /**
- * Module exports
- * @param database
- * Database object for connection
- * @return
- * Data operations if database is defined. Otherwise connection operations.
+ * Module will export database access methods if parameter database is defined.
+ * If it is not, connection methods will be exported.
+ * @param database Database object from returned connection or undefined
+ * @return Database access or connection methods
  */
 module.exports = (database) => {
     if (database) {
@@ -377,7 +442,7 @@ module.exports = (database) => {
                     db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation, err));
             });
         }, (err) => console.error(dbErrMsg.collList, err));
-        return dbapi;
+        return dataAccess;
     }
-    else return connect;
+    else return connection;
 };
