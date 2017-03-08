@@ -17,7 +17,8 @@ let db;
 const dbCollNames = {
     user: 'users',
     piece: 'pieces',
-    gameboard:  'gameboards',
+    gameboard: 'gameboards',
+    gamestate: 'gamestates',
 };
 
 /**
@@ -50,6 +51,18 @@ const dbSchemas = {
     gameboard: Joi.object().keys({
         name: Joi.string().required(),
         userID: Joi.string().required(),
+        _id: Joi.string().optional(),
+    }),
+    gamestate: Joi.object().keys({
+        players: Joi.array().items(
+            Joi.string()
+        ).required(),
+        winner: Joi.string().required(),
+        board: Joi.array().items(
+            Joi.array().items(
+                Joi.object()
+            )
+        ).required(),
         _id: Joi.string().optional(),
     }),
 };
@@ -396,6 +409,43 @@ const dataAccess = {
      */
     deleteGameboardByID: (gameboardID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, gameboardID), dbCollNames.gameboard, callback);
+    },
+
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gamestate
+     * @param callback
+     */
+    createGamestate: (gamestate, callback) => {
+        createItem(gamestate, dbSchemas.gamestate, dbCollNames.gamestate, callback);
+    },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gamestateID
+     * @param callback
+     */
+    getGamestateByID: (gamestateID, callback) => {
+        getItemByKeyValue(createKeyValuePair(IDKey, gamestateID), dbCollNames.gamestate, callback);
+    },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gamestate
+     * @param callback
+     */
+    updateGamestate: (gamestate, callback) => {
+        updateItem(gamestate, dbSchemas.gamestate, dbCollNames.gamestate, callback);
+    },
+    /**
+     *
+     * @memberOf module:dbConnector
+     * @param gamestateID
+     * @param callback
+     */
+    deleteGamestateByID: (gamestateID, callback) => {
+        deleteItemByKeyValue(createKeyValuePair(IDKey, gamestateID), dbCollNames.gamestate, callback);
     },
 };
 
