@@ -3,8 +3,7 @@ const bodyParser = require('body-parser');
 const config = require('./config.json');
 const db_config = require('./db/db_connector_config.json');
 const express = require('express');
-const mongodb = require('mongodb');
-const db = require('./db/dbConnector.js')(undefined);
+const db = require('./db/dbConnector.js')();
 const io = require('socket.io')();
 const path = require('path');
 

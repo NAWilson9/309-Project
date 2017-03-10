@@ -76,7 +76,7 @@ const dbSchemas = {
  */
 const validate = (item, itemSchema) => {
     return Joi.validate(item, itemSchema, {
-        // Will not cast types (string => number)
+        // Will not cast types (e.g. string => number)
         convert: false,
     });
 };
@@ -273,176 +273,194 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
 
 const dataAccess = {
     /**
-     * Create new User item in database
+     * Create new User item in database from given valid User object
      * Calls {@link module:dbConnector~createItem}
      * @memberOf module:dbConnector
-     * @param user User item
-     * @param callback
+     * @param {object} user User item
+     * @param {function} callback
      */
     createUser: (user, callback) => {
         createItem(user, dbSchemas.user, dbCollNames.user, callback);
     },
     /**
-     *
+     * Get User object by given username
+     * Calls {@link module:dbConnector~getItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param username
-     * @param callback
+     * @param {string} username
+     * @param {function} callback
      */
      getUserByUsername: (username, callback) => {
         getItemByKeyValue(createKeyValuePair(usernameKey, username), dbCollNames.user, callback);
     },
     /**
-     *
+     * Get User object by given ID
+     * Calls {@link module:dbConnector~getItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param userID
-     * @param callback
+     * @param {string} userID
+     * @param {function} callback
      */
     getUserByID: (userID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
     },
     /**
-     *
+     * Update (replace) User database entry with given valid User object
+     * Calls {@link module:dbConnector~updateItem}
      * @memberOf module:dbConnector
-     * @param user
-     * @param callback
+     * @param {object} user
+     * @param {function} callback
      */
     updateUser: (user, callback) => {
         updateItem(user, dbSchemas.user, dbCollNames.user, callback);
     },
     /**
-     *
+     * Delete Piece object with given ID from database
+     * Calls {@link module:dbConnector~deleteItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param userID
-     * @param callback
+     * @param {string} userID
+     * @param {function} callback
      */
     deleteUserByID: (userID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
     },
 
     /**
-     *
+     * Create new Piece item in database from given valid Piece object
+     * Calls {@link module:dbConnector~createItem}
      * @memberOf module:dbConnector
-     * @param piece
-     * @param callback
+     * @param {object} piece
+     * @param {function} callback
      */
     createPiece: (piece, callback) => {
         createItem(piece, dbSchemas.piece, dbCollNames.piece, callback);
     },
     /**
-     *
+     * Get Piece object by given ID
+     * Calls {@link module:dbConnector~getItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param pieceID
-     * @param callback
+     * @param {string} pieceID
+     * @param {function} callback
      */
     getPieceByID: (pieceID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, pieceID), dbCollNames.piece, callback);
     },
     /**
-     *
+     * Get all Piece objects in database created by User with given ID
+     * Calls {@link module:dbConnector~getItemsByUserID}
      * @memberOf module:dbConnector
-     * @param userID
-     * @param callback
+     * @param {string} userID
+     * @param {function} callback
      */
     getPiecesByUserID: (userID, callback) => {
         getItemsByUserID(userID, dbCollNames.piece, callback);
     },
     /**
-     *
+     * Update (replace) Piece database entry with given valid Piece object
+     * Calls {@link module:dbConnector~updateItem}
      * @memberOf module:dbConnector
-     * @param piece
-     * @param callback
+     * @param {object} piece
+     * @param {function} callback
      */
     updatePiece: (piece, callback) => {
         updateItem(piece, dbSchemas.piece, dbCollNames.piece, callback);
     },
     /**
-     *
+     * Delete Piece object with given ID from database
+     * Calls {@link module:dbConnector~deleteItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param pieceID
-     * @param callback
+     * @param {string} pieceID
+     * @param {function} callback
      */
     deletePieceByID: (pieceID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, pieceID), dbCollNames.piece, callback);
     },
 
     /**
-     *
+     * Create new Gameboard item in database from given valid Gameboard object
+     * Calls {@link module:dbConnector~createItem}
      * @memberOf module:dbConnector
-     * @param gameboard
-     * @param callback
+     * @param {object} gameboard
+     * @param {function} callback
      */
     createGameboard: (gameboard, callback) => {
         createItem(gameboard, dbSchemas.gameboard, dbCollNames.gameboard, callback);
     },
     /**
-     *
+     * Get Gameboard object by given ID
+     * Calls {@link module:dbConnector~getItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param gameboardID
-     * @param callback
+     * @param {string} gameboardID
+     * @param {function} callback
      */
     getGameboardByID: (gameboardID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, gameboardID), dbCollNames.gameboard, callback);
     },
     /**
-     *
+     * Get all Gameboard objects in database created by User with given ID
+     * Calls {@link module:dbConnector~getItemsByUserID}
      * @memberOf module:dbConnector
-     * @param userID
-     * @param callback
+     * @param {string} userID
+     * @param {function} callback
      */
     getGameboardsByUserID: (userID, callback) => {
         getItemsByUserID(userID, dbCollNames.gameboard, callback);
     },
     /**
-     *
+     * Update (replace) Gameboard database entry with given valid Gameboard object
+     * Calls {@link module:dbConnector~updateItem}
      * @memberOf module:dbConnector
-     * @param gameboard
-     * @param callback
+     * @param {object} gameboard
+     * @param {function} callback
      */
     updateGameboard: (gameboard, callback) => {
         updateItem(gameboard, dbSchemas.gameboard, dbCollNames.gameboard, callback);
     },
     /**
-     *
+     * Delete Gameboard object with given ID from database
+     * Calls {@link module:dbConnector~deleteItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param gameboardID
-     * @param callback
+     * @param {string} gameboardID
+     * @param {function} callback
      */
     deleteGameboardByID: (gameboardID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, gameboardID), dbCollNames.gameboard, callback);
     },
 
     /**
-     *
+     * Create new Gamestate item in database from given valid Gameboard object
+     * Calls {@link module:dbConnector~createItem}
      * @memberOf module:dbConnector
-     * @param gamestate
-     * @param callback
+     * @param {object} gamestate
+     * @param {function} callback
      */
     createGamestate: (gamestate, callback) => {
         createItem(gamestate, dbSchemas.gamestate, dbCollNames.gamestate, callback);
     },
     /**
-     *
+     * Get Gamestate object by given ID
+     * Calls {@link module:dbConnector~getItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param gamestateID
-     * @param callback
+     * @param {string} gamestateID
+     * @param {function} callback
      */
     getGamestateByID: (gamestateID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, gamestateID), dbCollNames.gamestate, callback);
     },
     /**
-     *
+     * Update (replace) Gamestate database entry with given valid Gamestate object
+     * Calls {@link module:dbConnector~updateItem}
      * @memberOf module:dbConnector
-     * @param gamestate
-     * @param callback
+     * @param {object} gamestate
+     * @param {function} callback
      */
     updateGamestate: (gamestate, callback) => {
         updateItem(gamestate, dbSchemas.gamestate, dbCollNames.gamestate, callback);
     },
     /**
-     *
+     * Delete Gamestate object with given ID from database
+     * Calls {@link module:dbConnector~deleteItemByKeyValue}
      * @memberOf module:dbConnector
-     * @param gamestateID
-     * @param callback
+     * @param {string} gamestateID
+     * @param {function} callback
      */
     deleteGamestateByID: (gamestateID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, gamestateID), dbCollNames.gamestate, callback);
@@ -453,9 +471,9 @@ const connection = {
     /**
      * Call to connect to database. If connection fails, connection will be attempted again every 5 seconds.
      * @memberOf module:dbConnector
-     * @param app Express app that will use database dependent modules
-     * @param host Database host address
-     * @param dependentModules Array of modules functions to be called with the database object as a parameter
+     * @param {object} app Express app that will use database dependent modules
+     * @param {string} host Database host address
+     * @param {array} dependentModules Array of modules functions to be called with the database object as a parameter
      */
     connect: function (app, host, dependentModules) {
         mongodb.MongoClient.connect(host, (err, db) => {
@@ -477,8 +495,8 @@ const connection = {
 /**
  * Module will export database access methods if parameter database is defined.
  * If it is not, connection methods will be exported.
- * @param database Database object from returned connection or undefined
- * @return Database access or connection methods
+ * @param {object} database Database object from returned connection or undefined
+ * @return {object} Database access or connection methods
  */
 module.exports = (database) => {
     if (database) {
@@ -488,6 +506,7 @@ module.exports = (database) => {
             let names = [];
             res.forEach((coll) => names.push(coll.name));
             Object.keys(dbCollNames).forEach((collNameKey) => {
+                console.log(collNameKey);
                 if (!names.includes(dbCollNames[collNameKey]))
                     db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation, err));
             });
