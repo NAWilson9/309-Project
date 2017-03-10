@@ -4,16 +4,22 @@ const fs = require('fs');
 const path = require('path');
 const router = require('express').Router();
 //Routing
-/*
-Handles post requests to /api/pieces
-Expects one parameter
-- id: int (specified in the query body)
 
-This takes in an id of a piece to update
-If the id is found in the file it updates the piece information to the info specified
-If the id is not found it creates a new piece with that id and specified info
+/**
+ * Helper function for post requests.
+ *
+ * If no ID is specified in the req body it sends an error to the client.
+ * If an ID is specified it queries the server to see if a piece with the given ID exists.
+ * If so the piece is updated, if not then the piece is created and stored.
+ * Then the resulting updated or new piece is sent back to the client.
+ * If an error is encountered then the error is sent to the client and execution stops.
+ *
+ * @param req - contains the information for the request
+ * @param res - the object to send results to
+ *
+ *
  */
-router.post('/api/pieces', function(req, res) {
+const piecePostHelper = function (req, res) {
     let id = req.body.id;
 
     if(!id){
@@ -56,20 +62,25 @@ router.post('/api/pieces', function(req, res) {
             }
         });
     }
-    });
-/*
-Handles get requests to /api/pieces
-Expects two parameters
-- ids: array of ints
-- creator: string
+};
+router.post('/api/pieces', piecePostHelper);
 
-This takes in ids of a piece or a creator of a piece.
-If both ids and creator are specified we return an error asking for one or the other
-If neither ids or creator are specified we return an error stating so
-If ids are specified we look for pieces with the ids specified and return them
-If a creator is specified we look for pieces by that creator and return them
+/**
+ * Helper function for get requests.
+ *
+ * If IDs are specified in the req body it queries the server to get the information for each piece with a specified ID.
+ * If one is not found then an error is sent to the requesting client and execution stops.
+ * Otherwise all the pieces information is sent back to the client.
+ * If a creator is specified it queries the server for all pieces created by that user.
+ * If none are found it sends an error to the client.
+ * Otherwise it sends the found pieces information to the client.
+ *
+ * @param req - contains the information for the request
+ * @param res - the object to send results to
+ *
+ *
  */
-router.get('/api/pieces', function (req, res) {
+const pieceGetHelper =function (req, res) {
     let ids = req.query.id;
     if(ids) {
         ids = ids.split(',');
@@ -115,5 +126,7 @@ router.get('/api/pieces', function (req, res) {
         }
         res.send(returnPieces);
     }
-});
+};
+
+router.get('/api/pieces', pieceGetHelper);
 module.exports = router;
