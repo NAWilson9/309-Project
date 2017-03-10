@@ -1,3 +1,7 @@
+/**
+ * CHSS Board Connector - by Lyle Lovig
+ * @module boardConnector
+ */
 
 //Link dependencies
 let config = require('./board_connector_config.json');

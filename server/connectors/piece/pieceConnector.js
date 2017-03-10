@@ -1,3 +1,8 @@
+/**
+ * CHSS Piece Connector - by Lyle Lovig
+ * @module pieceConnector
+ */
+
 //Link dependencies
 let config = require('./piece_connector_config.json');
 const fs = require('fs');
