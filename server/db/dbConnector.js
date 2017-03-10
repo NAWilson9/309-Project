@@ -70,9 +70,9 @@ const dbSchemas = {
 /**
  * Global validation function
  * @private
- * @param item Item to validate
- * @param itemSchema Schema to validate against
- * @return Joi.validate() result
+ * @param {object} item Item to validate
+ * @param {object} itemSchema Schema to validate against
+ * @return {object} Joi.validate() result
  */
 const validate = (item, itemSchema) => {
     return Joi.validate(item, itemSchema, {
@@ -85,7 +85,7 @@ const validate = (item, itemSchema) => {
  * Helper Function for response to API user
  * Calls callback function with error and response if callback provided
  * @private
- * @param callback
+ * @param {function} callback
  * @param err
  * @param res
  */
@@ -113,10 +113,10 @@ const dbErrMsg = {
 /**
  * Adds a given valid item to given collection
  * @private
- * @param item Object to insert into database
- * @param itemSchema Schema to use in item format validation
- * @param collectionName Collection that contains item
- * @param callback Called with error or result upon Promise return from database operation
+ * @param {object} item Object to insert into database
+ * @param {object} itemSchema Schema to use in item format validation
+ * @param {string} collectionName Collection that contains item
+ * @param {function} callback Called with error or result upon Promise return from database operation
  * @res Item inserted into database or undefined if error
  * @err No entry data specified, Improper entry format + validation error, Database error, or Undefined if no error
  */
@@ -138,12 +138,12 @@ const createItem = (item, itemSchema, collectionName, callback) => {
 /**
  * Retrieves a item with the given key value pair from database
  * @private
- * @param keyValuePair
+ * @param {object} keyValuePair
  * Key value pair by which to search for item to retrieve from database
  * For definition check, must also contain 'value' property with value equivalent to surrounding function's caller's query value
  * 'value' property is deleted after check if value is defined
- * @param collectionName Collection that contains item
- * @param callback Called with error or result upon Promise return from database operation
+ * @param {string} collectionName Collection that contains item
+ * @param {function} callback Called with error or result upon Promise return from database operation
  * @res Item if found, null if not, undefined if error
  * @err Database error, Improper ID format, or Undefined if no error
  */
@@ -170,7 +170,7 @@ const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
  * Helper Function
  * Creates object formatted for input to getItemByKeyValue()
  * @private
- * @param key
+ * @param {string} key
  * @param value
  * @return Properly formatted object
  */
@@ -187,9 +187,9 @@ const IDKey = '_id';
 /**
  * Retrieves all of the items created by the User with the given userID from given collection
  * @private
- * @param userID ID of user that created items to retrieve from database
- * @param collectionName Collection that contains items
- * @param callback Called with error or result upon Promise return from database operation
+ * @param {string} userID ID of user that created items to retrieve from database
+ * @param {string} collectionName Collection that contains items
+ * @param {function} callback Called with error or result upon Promise return from database operation
  * @res Array of items found (empty array if none found) or undefined if error
  * @err Database error, Undefined if no error
  */
@@ -210,10 +210,10 @@ const getItemsByUserID = (userID, collectionName, callback) => {
  * Replaces item's current database entry with given item
  * Matches entry by ID, therefore item must have property "_id" with proper value
  * @private
- * @param item Item to become new entry
- * @param itemSchema Schema to use in item format validation
- * @param collectionName Collection that contains item
- * @param callback Called with error or result upon Promise return from database operation
+ * @param {object} item Item to become new entry
+ * @param {object} itemSchema Schema to use in item format validation
+ * @param {string} collectionName Collection that contains item
+ * @param {function} callback Called with error or result upon Promise return from database operation
  * @res Updated item if original item found, null if not found, undefined if error
  * @err No entry data specified, No ID specified, Improper entry format + validation error, Database error, or Undefined if no error
  */
@@ -242,12 +242,12 @@ const updateItem = (item, itemSchema, collectionName, callback) => {
 /**
  * Deletes an item with the given key value pair from database
  * @private
- * @param keyValuePair
+ * @param {object} keyValuePair
  * Key value pair by which to search for item to delete from database
  * For definition check, must also contain 'value' property with value equivalent to surrounding function's caller's query value
  * 'value' property is deleted after check if value is defined
- * @param collectionName Collection that contains item
- * @param callback Called with error or result upon Promise return from database operation
+ * @param {string} collectionName Collection that contains item
+ * @param {function} callback Called with error or result upon Promise return from database operation
  * @res Deleted item if found and deleted, null if not found, undefined if error
  * @err Database error, Improper ID format, Undefined if no error
  */
@@ -276,7 +276,7 @@ const dataAccess = {
      * Create new User item in database from given valid User object
      * Calls {@link module:dbConnector~createItem}
      * @memberOf module:dbConnector
-     * @param {object} user User item
+     * @param {object} user
      * @param {function} callback
      */
     createUser: (user, callback) => {
