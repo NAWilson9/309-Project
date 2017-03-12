@@ -3,9 +3,11 @@ import React from 'react';
 const getStyle = function(props){
     return {
         borderStyle: 'solid',
+        borderWidth: '1px',
         width: (100/props.rowCount) + '%',
         height: '100%',
-        display: 'inline-block'
+        display: 'inline-block',
+        backgroundColor: (props.even) ? 'darkgrey' : 'white'
     };
 };
 

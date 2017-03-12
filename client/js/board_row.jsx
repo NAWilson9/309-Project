@@ -10,7 +10,7 @@ const getStyles = function(props){
 const BoardRow = React.createClass({
     render() {
         const row = this.props.rowData.map(function(item, i){
-            return <BoardSquare key={i} number={item} rowCount={this.props.rowData.length}/>
+            return <BoardSquare key={i} number={item} rowCount={this.props.rowData.length} even={(this.props.even) ? (i%2 == 0) : ((i+1)%2 == 0)}/>
         }, this);
 
         return (

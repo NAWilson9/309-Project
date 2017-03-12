@@ -4,6 +4,7 @@ import BoardRow from './board_row.jsx';
 const getStyle = function(){
     return {
         borderStyle: 'solid',
+        borderWidth: '2px',
         width: '800px',
         height: '800px'
     };
@@ -22,8 +23,8 @@ const gg = [
 
 const Board = React.createClass({
     render() {
-        var board = gg.map(function(row, i){
-            return <BoardRow key={i} rowData={row} numberOfRows={gg.length}/>
+        const board = gg.map(function(row, i){
+            return <BoardRow key={i} rowData={row} numberOfRows={gg.length} even={i%2 == 0}/>
         });
 
         return (
