@@ -27,9 +27,7 @@ const Board = React.createClass({
         });
 
         return (
-            <div style={getStyle()}>
-            {board}
-            </div>
+            <div style={getStyle()}>{board}</div>
         );
     }
 });

@@ -9,15 +9,12 @@ const getStyles = function(props){
 
 const BoardRow = React.createClass({
     render() {
-        const self = this;
         const row = this.props.rowData.map(function(item, i){
-            return <BoardSquare key={i} number={item} rowCount={self.props.rowData.length}/>
-        });
+            return <BoardSquare key={i} number={item} rowCount={this.props.rowData.length}/>
+        }, this);
 
         return (
-            <div style={getStyles(this.props)}>
-                {row}
-            </div>
+            <div style={getStyles(this.props)}>{row}</div>
         );
     }
 });
