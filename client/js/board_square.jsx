@@ -5,7 +5,8 @@ const getStyle = function(props){
         borderStyle: 'solid',
         borderWidth: '1px',
         width: (100/props.rowCount) + '%',
-        height: '100%',
+        paddingTop: (100/props.rowCount) - 2 + '%',
+        // height: '100%',
         display: 'inline-block',
         backgroundColor: (props.even) ? 'darkgrey' : 'white',
         textAlign: 'center'

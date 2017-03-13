@@ -5,8 +5,12 @@ const getStyle = function(){
     return {
         borderStyle: 'solid',
         borderWidth: '2px',
-        width: '800px',
-        height: '800px'
+        // height: '900px',
+        width: '100%',
+        // paddingTop: '100%'
+    // width: '800px',
+        // height: '800px',
+        // display: 'inline-block'
     };
 };
 
