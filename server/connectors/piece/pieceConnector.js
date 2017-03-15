@@ -47,7 +47,7 @@ const piecePostHelper = function (req, res) {
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new piece data.');
                 console.error(err);
             } else {
-                res.send(piece);
+                res.send(config.pieces.find((piece) => piece.id === id));
             }
         });
     }
