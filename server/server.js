@@ -10,6 +10,7 @@ const path = require('path');
 //Connectors
 const userConnector = require('./connectors/user/userConnector');
 const pieceConnector = require('./connectors/piece/pieceConnector');
+const boardConnector = require('./connectors/boardConnector/boardConnector');
 
 //Middleware definitions
 const logging = function logging(req, res, next) {
@@ -23,6 +24,7 @@ app.use(bodyParser.json());
 app.use(logging);
 app.use(userConnector);
 app.use(pieceConnector);
+app.use(boardConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
 app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['html']}));
 
