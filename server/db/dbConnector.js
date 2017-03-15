@@ -506,7 +506,6 @@ module.exports = (database) => {
             let names = [];
             res.forEach((coll) => names.push(coll.name));
             Object.keys(dbCollNames).forEach((collNameKey) => {
-                console.log(collNameKey);
                 if (!names.includes(dbCollNames[collNameKey]))
                     db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation, err));
             });

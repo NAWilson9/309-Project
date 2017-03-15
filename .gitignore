@@ -3,8 +3,6 @@ client/vendor.js*
 
 *.idea*
 
-/server/db/db_connector_mysql_config.json
-/server/db/dbConnector_mysql.js
 /server/db/dbRequestTest.js
 
 # Created by https://www.gitignore.io/api/webstorm,node,windows,osx,linux
