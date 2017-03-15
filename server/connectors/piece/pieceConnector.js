@@ -46,10 +46,8 @@ const piecePostHelper = function (req, res) {
                 res.send('Error saving new piece data.');
                 console.error(new Date().toLocaleTimeString() + ' | Unable to save new piece data.');
                 console.error(err);
-                return;
             } else {
                 res.send(piece);
-                return;
             }
         });
     }
@@ -63,7 +61,6 @@ const piecePostHelper = function (req, res) {
                 console.error(err);
             } else {
                 res.send(config.pieces[config.pieces.length-1]);
-                return;
             }
         });
     }
@@ -117,7 +114,7 @@ const pieceGetHelper =function (req, res) {
     }
     if(ids){
         config.pieces.forEach(function (piece) {
-            for(var i=0;i < ids.length;i++) {
+            for(let i=0;i < ids.length;i++) {
                 if (piece.id == ids[i]) {
                     returnPieces.push(piece);
                     return;
