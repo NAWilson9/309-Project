@@ -25,3 +25,14 @@ significantly more difficult. If you would like the bundles to be rebuilt as
 you make front end changes so that you don't have to manually rebuild
 every time, you can run the command `npm run watch`.
 
+To setup and use the database for local development
+1. Install MongoDB
+https://docs.mongodb.com/manual/administration/install-community/
+2. Run MongoDB from terminal from path specified in setup:
+    `mongod --dbpath /path/to/db`
+3. Within your module, create a `db` variable and make `module.exports` a function: 
+    `module.exports = (database) => {
+        db = require('/relative/path/to/dbConnector')(database);
+        return whateverModuleExports;
+    };`
+4. Place middleware that requires database access within database connection array parameter.
