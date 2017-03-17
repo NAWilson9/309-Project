@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const config = require('./config.json');
 const db_config = require('./db/db_connector_config.json');
 const express = require('express');
-const db = require('./db/dbConnector.js')();
+const dbConnect = require('./db/dbConnector.js')();
 const io = require('socket.io')();
 const path = require('path');
 
@@ -28,15 +28,21 @@ app.use(boardConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
 app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['html']}));
 
+//Database (will be initialized in callback of dbConnect.connect below)
+let db;
+let Game;
 //Connect to database
-db.connect(app, db_config.host, [
-    //Place database dependent modules (as uncalled function) in here
+dbConnect.connect(app, db_config.host, [
+    //Place database dependent express middleware (as uncalled functions) in here
     // example:
     // userConnector,
     // pieceConnector,
     // gameboardConnector,
 
-]);
+], (database) => {
+    db = database;
+    Game = require('./game/game')(database);
+});
 
 //Starts the servers
 io.listen(app.listen(config.port, function () {

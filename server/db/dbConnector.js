@@ -474,13 +474,14 @@ const connection = {
      * @param {object} app Express app that will use database dependent modules
      * @param {string} host Database host address
      * @param {array} dependentModules Array of modules functions to be called with the database object as a parameter
+     * @param {function} callback Called with db object as parameter
      */
-    connect: function (app, host, dependentModules) {
+    connect: function (app, host, dependentModules, callback) {
         mongodb.MongoClient.connect(host, (err, db) => {
             if (err) {
                 console.error(dbErrMsg.connect);
                 setTimeout(() => {
-                    this.connect(app, host, dependentModules);
+                    this.connect(app, host, dependentModules, callback);
                 }, 5000);
                 return;
             }
@@ -488,6 +489,7 @@ const connection = {
             for (let moduleIndex in dependentModules) {
                 app.use(dependentModules[moduleIndex](db));
             }
+            callback(db);
         });
     },
 };

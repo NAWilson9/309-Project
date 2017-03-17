@@ -3,10 +3,13 @@
  */
 const Piece = require('./piece');
 
-function Board() {
-    this.grid = [
+let db;
 
-    ];
+function Board(grid) {
+    this.grid = grid;
 }
 
-module.exports = Board;
+module.exports = (database) => {
+    db = database;
+    return Board;
+};
