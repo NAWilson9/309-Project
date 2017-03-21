@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from "react-redux"
-import BoardRow from './board_row.jsx';
 
 const getStyle = function(over){
     return {
@@ -10,7 +9,7 @@ const getStyle = function(over){
         width: '100%',
         color: (over) ? 'red' : null
         // paddingTop: '100%'
-    // width: '800px',
+        // width: '800px',
         // height: '800px',
         // display: 'inline-block'
     };
@@ -18,18 +17,17 @@ const getStyle = function(over){
 
 @connect((store) => {
     return {
-        board: store.game.board,
-        over: store.game.over
+        moves: store.game.moves,
+        time: store.game.time
     };
 })
-export default class Board  extends React.Component{
+export default class GameInfo extends React.Component{
     render() {
-        const board = this.props.board.map(function(row, i){
-            return <BoardRow key={i} rowData={row} numberOfRows={this.props.board.length} even={i%2 == 0}/>
-        }, this);
-
         return (
-            <div style={getStyle(this.props.over)}>{board}</div>
-        );
+            <div>
+                <div>Number of moves: {this.props.moves}</div>
+                <div>Time: {this.props.time} seconds</div>
+            </div>
+        )
     }
 };

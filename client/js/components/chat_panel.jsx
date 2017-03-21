@@ -1,5 +1,6 @@
 import React from 'react'
-import { Feed } from 'semantic-ui-react'
+import { connect } from "react-redux"
+import { Button, Feed, Input } from 'semantic-ui-react'
 import ChatEntry from './chat_entry.jsx'
 
 // const getStyles = function(props){
@@ -10,19 +11,29 @@ import ChatEntry from './chat_entry.jsx'
 //     }
 // };
 
-const ChatPanel = React.createClass({
+@connect((store) => {
+    return {
+        log: store.chat.log
+    };
+})
+export default class ChatPanel extends React.Component{
     render() {
-        const chatItems = this.props.chatEntries.map(function(entry, i){
+        const chatItems = this.props.log.map(function(entry, i){
            return <ChatEntry key={i} entryData={entry}/>
         });
 
         return (
-           <Feed>
-               {chatItems}
-           </Feed>
+            <div>
+                <Feed>
+                    {chatItems}
+                </Feed>
+                <div>
+                    <Input fluid placeholder="New message...">
+                        <input onSubmit={function(){console.log('test')}}/>
+                        <Button type="submit">Enter</Button>
+                    </Input>
+                </div>
+            </div>
         );
     }
-});
-
-
-export default ChatPanel;
+};

@@ -10,11 +10,23 @@ ReactDOM.render(
         <Page/>
     </Provider>, document.getElementById('app'));
 
-setTimeout(function(){
+setInterval(function(){
     store.dispatch({
         type: "gg",
         payload: true
     });
+
+    store.dispatch({
+        type: "move",
+        payload: true
+    });
+
     console.log(store.getState());
 }, 3000);
 
+setInterval(function(){
+    store.dispatch({
+        type: "tick",
+        payload: null
+    });
+}, 1000);

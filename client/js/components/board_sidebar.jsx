@@ -1,6 +1,7 @@
 import React from 'react';
 import { Accordion, Segment, Icon} from 'semantic-ui-react';
 import ChatPanel from './chat_panel.jsx';
+import GameInfo from './gameInfo.jsx';
 
 const getStyles = function(props){
     return {
@@ -27,31 +28,6 @@ const getPanels = function(){
   ]
 };
 
-const getChat = function(){
-    return [
-        {
-            'username':'Player 1',
-            'time': '11:45AM',
-            'content': 'Ur trash'
-        },
-        {
-            'username':'Player 2',
-            'time': '11:45AM',
-            'content': 'i know'
-        },
-        {
-            'username':'Player 1',
-            'time': '11:46AM',
-            'content': 'Git Gud'
-        },
-        {
-            'username':'Player 2',
-            'time': '11:45AM',
-            'content': 'I\'m trying but I can\'t'
-        }
-    ]
-};
-
 const BoardRow = React.createClass({
     render() {
         return (
@@ -62,7 +38,7 @@ const BoardRow = React.createClass({
                         Game Info
                     </Accordion.Title>
                     <Accordion.Content>
-
+                        <GameInfo/>
                     </Accordion.Content>
                     <Accordion.Title>
                         <Icon name='dropdown' />
@@ -77,7 +53,7 @@ const BoardRow = React.createClass({
                         {true == true && <Icon name='comment'/>}
                     </Accordion.Title>
                     <Accordion.Content>
-                        <ChatPanel chatEntries={getChat()}/>
+                        <ChatPanel/>
                     </Accordion.Content>
                 </Accordion>
             </Segment>
