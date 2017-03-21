@@ -1,7 +1,20 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var header = require('./header.jsx');
-import Page from './page.jsx';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from "react-redux";
 
-ReactDOM.render(React.createElement(Page), document.getElementById('react-app'));
+import Page from './components/page.jsx';
+import store from "./store"
+
+ReactDOM.render(
+    <Provider store={store}>
+        <Page/>
+    </Provider>, document.getElementById('app'));
+
+setTimeout(function(){
+    store.dispatch({
+        type: "gg",
+        payload: true
+    });
+    console.log(store.getState());
+}, 3000);
 

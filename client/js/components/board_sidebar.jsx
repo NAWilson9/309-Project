@@ -5,7 +5,7 @@ import ChatPanel from './chat_panel.jsx';
 const getStyles = function(props){
     return {
         // display: 'inline-block',
-        // height: '100%',
+        height: '100%',
         // width: '30%'
     }
 };
