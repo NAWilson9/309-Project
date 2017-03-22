@@ -1,18 +1,30 @@
-import React from 'react'
-import GameView from './game_view.jsx';
+import { connect } from "react-redux"
+import React from 'react';
+
 import CHSSHeader from './header.jsx';
+import GameView from './game_view.jsx';
 
+@connect((store) => {
+    return {
+        view: store.view.page
+    };
+})
+export default class Page  extends React.Component{
 
-const Page = React.createClass({
+    getPageComponent(){
+        if(this.props.view === 'game'){
+            return <GameView/>
+        } else {
+            return <section><h1>In progress...</h1></section>;
+        }
+    };
+
     render() {
         return (
-            <div>
-                <CHSSHeader/>
-                <GameView/>
-            </div>
+            <main>
+                <CHSSHeader currentPage={this.props.view} dispatch={this.props.dispatch}/>
+                {this.getPageComponent()}
+            </main>
         );
     }
-});
-
-
-export default Page;
+};

@@ -1,15 +1,18 @@
+import { Provider } from "react-redux";
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from "react-redux";
 
-import Page from './components/page.jsx';
 import store from "./store"
+import Page from './components/page.jsx';
 
 ReactDOM.render(
     <Provider store={store}>
         <Page/>
-    </Provider>, document.getElementById('app'));
+    </Provider>, document.getElementById('CHSS')
+);
 
+
+//Todo: Remove these
 setInterval(function(){
     store.dispatch({
         type: "gg",

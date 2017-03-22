@@ -22,7 +22,7 @@ const getStyle = function(over){
         over: store.game.over
     };
 })
-export default class Board  extends React.Component{
+export default class Board extends React.Component{
     render() {
         const board = this.props.board.map(function(row, i){
             return <BoardRow key={i} rowData={row} numberOfRows={this.props.board.length} even={i%2 == 0}/>
