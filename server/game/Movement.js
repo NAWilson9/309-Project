@@ -4,17 +4,20 @@
 
 export default class Movement {
     constructor(props) {
+        this.next = null;
+        this.prev = null;
+        this.mustPerform = props.mustPerform;
         this.mustComplete = props.mustComplete;
         this.possibleDirections = props.possibleDirections;
         this.maxDistance = props.maxDistance;
-        this.execute = (results) => {
-            return props.execute(results);
+        this.perform = (distanceTravelled, results) => {
+            return props.perform(distanceTravelled, results);
         }
     }
 }
 
-export class dependentMovement extends Movement {
-    constructor(props) {
-        super(props);
-    }
-}
+// export class dependentMovement extends Movement {
+//     constructor(props) {
+//         super(props);
+//     }
+// }

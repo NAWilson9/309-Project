@@ -2,64 +2,120 @@
  * Created by ajrmatt on 3/15/17.
  */
 import Movement from './Movement'
-import Step from './Step'
+import MovementList from './MovementList'
 
 export default class Piece {
     constructor(props) {
         this.name = props.name;
         this.userID = props.userID;
-        this.abilities = props.abilities;
         this._id = props._id;
+        this.abilities.movements = props.movements;
+        this.abilities.destinations = generateRelativeLocations(props.movements);
     }
 }
 
-export class KnightMove extends Piece {
-    constructor(props) {
-        super(props);
-        this.abilities = {
-            movements: [
-                new Movement({
-                    possibleDirections: new DirectionSet(dirSets.orthogonal),
-                    maxDistance: 2,
-                    execute: () => {
+function generateRelativeLocations(movementList) {
+    let locations = [];
+    let movement = movementList.first;
+    while (movement !== null) {
+        for (let dirIndex in movement.possibleDirections) {
+            console.log(movement.possibleDirections[dirIndex]);
+            if (movement.possibleDirections[dirIndex] > 0) {
 
-                    }
-                }),
-                new Movement({
-                    possibleDirections
-                }),
-            ]
+            }
         }
     }
+    return locations;
+}
+function getRelativeLocation(direction, distance) {
+    let location = { x: 0, y: 0, };
+    switch (direction) {
+        case 1 :
+            location.x = -1*distance;
+            location.y = -1*distance;
+            break;
+        case 2 :
+            location.y = -1*distance;
+            break;
+        case 3 :
+            location.x = 1*distance;
+            location.y = -1*distance;
+            break;
+        case 4 :
+            location.x = 1*distance;
+            break;
+        case 5 :
+            location.x = 1*distance;
+            location.y = 1*distance;
+            break;
+        case 6 :
+            location.y = 1*distance;
+            break;
+        case 7 :
+            location.x = -1*distance;
+            location.y = 1*distance;
+            break;
+        case 8 :
+            location.x = -1*distance;
+            break;
+    }
+    return location;
 }
 
-export class KnightStep extends Piece {
+function containsEquivalentObject() {
+
+}
+
+export class Knight extends Piece {
     constructor(props) {
+        props.movements = new MovementList([
+            new Movement({
+                mustPerform: true,
+                mustComplete: false,
+                possibleDirections: new DirectionSet(dirSets.orthogonal),
+                maxDistance: 2,
+                perform: (distanceTravelled, results) => {
+
+                },
+            }),
+            new Movement({
+                mustPerform: true,
+                mustComplete: true,
+                maxDistance: 2,
+                possibleDirections: null,
+            }),
+        ]);
         super(props);
-        this.abilities = {
-            steps: [
-                new Step({
-                    directions: directionSets.orthogonal,
-                    repsLeft: 2,
-                    nextSteps: (directionChosen) => {
-                        if (this.repsLeft === 0) {
-                            this.repsLeft = this.repsLeft - 1;
-                            let directions = this.directions.slice();
-                            directions[directionChosen-1] = 0;
-                            return [
-                                this,
-                                new Step({
-                                    directions: directions,
-                                    repsLeft:
-                                })
-                            ]
-                        }
-                    },
-                })
-            ],
-        }
     }
 }
+
+// export class KnightStep extends Piece {
+//     constructor(props) {
+//         super(props);
+//         this.abilities = {
+//             steps: [
+//                 new Step({
+//                     directions: directionSets.orthogonal,
+//                     repsLeft: 2,
+//                     nextSteps: (directionChosen) => {
+//                         if (this.repsLeft === 0) {
+//                             this.repsLeft = this.repsLeft - 1;
+//                             let directions = this.directions.slice();
+//                             directions[directionChosen-1] = 0;
+//                             return [
+//                                 this,
+//                                 new Step({
+//                                     directions: directions,
+//                                     repsLeft:
+//                                 })
+//                             ]
+//                         }
+//                     },
+//                 })
+//             ],
+//         }
+//     }
+// }
 
 /**
  * |1|2|3|
