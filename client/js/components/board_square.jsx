@@ -2,11 +2,11 @@ import React from 'react';
 
 const getStyle = function(props){
     return {
-        borderStyle: 'solid',
-        borderWidth: '1px',
+        // borderStyle: 'solid',
+        // borderWidth: '1px',
         width: (100/props.rowCount) + '%',
-        paddingTop: (100/props.rowCount) - 2 + '%',
-        // height: '100%',
+        // paddingTop: (100/props.rowCount) - 2 + '%',
+        height: (100/props.rowCount) + '%',
         display: 'inline-block',
         backgroundColor: (props.even) ? 'darkgrey' : 'white',
         textAlign: 'center'
@@ -33,15 +33,21 @@ function dragstart_handler(ev) {
     // ev.dataTransfer.setData("text/plain", this.props.number);
 }
 
-const BoardSquare = React.createClass({
-    render() {
+export default class BoardSquare extends React.Component{
+    click(test){
+        console.log("[" + this.props.rowNumber + "," + this.props.cellNumber + "]");
+    };
+
+    render(){
+        let image = (this.props.data.image != null)
+            ? <img src={'./images/' + this.props.data.image} style={{maxWidth: '96%', maxHeight: '96%'}}/>
+            : <div style={{paddingTop:'100%'}}/>;
+
         return (
-            <div style={getStyle(this.props)}>
-                <div draggable="true" onDragStart={dragstart_handler} onDragOver={dragover_handler} onDrop={dragover_handler} style={{width: '100%', height: '100%'}}>{this.props.number}</div>
+            <div style={getStyle(this.props)} onClick={()=>this.click()}>
+                {image}
+                {/*<div draggable="true" onDragStart={dragstart_handler} onDragOver={dragover_handler} onDrop={dragover_handler}>{this.props.data.number}</div>*/}
             </div>
         );
     }
-});
-
-
-export default BoardSquare;
+};

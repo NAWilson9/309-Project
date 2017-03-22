@@ -1,14 +1,278 @@
 export default function reducer(state={
     players: [],
     board: [
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8],
-        [1,2,3,4,5,6,7,8]
+        [
+            {
+                number: 1,
+                image: 'rook.svg'
+            },
+            {
+                number: 2,
+                image: 'knight.svg'
+            },
+            {
+                number: 3,
+                image: 'bishop.svg'
+            },
+            {
+                number: 4,
+                image: 'king.svg'
+            },
+            {
+                number: 5,
+                image: 'queen.svg'
+            },
+            {
+                number: 6,
+                image: 'bishop.svg'
+            },
+            {
+                number: 7,
+                image: 'knight.svg'
+            },
+            {
+                number: 8,
+                image: 'rook.svg'
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: 'pawn.svg'
+            },
+            {
+                number: 2,
+                image: 'pawn.svg'
+            },
+            {
+                number: 3,
+                image: 'pawn.svg'
+            },
+            {
+                number: 4,
+                image: 'pawn.svg'
+            },
+            {
+                number: 5,
+                image: 'pawn.svg'
+            },
+            {
+                number: 6,
+                image: 'pawn.svg'
+            },
+            {
+                number: 7,
+                image: 'pawn.svg'
+            },
+            {
+                number: 8,
+                image: 'pawn.svg'
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: null
+            },
+            {
+                number: 2,
+                image: null
+            },
+            {
+                number: 3,
+                image: null
+            },
+            {
+                number: 4,
+                image: null
+            },
+            {
+                number: 5,
+                image: null
+            },
+            {
+                number: 6,
+                image: null
+            },
+            {
+                number: 7,
+                image: null
+            },
+            {
+                number: 8,
+                image: null
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: null
+            },
+            {
+                number: 2,
+                image: null
+            },
+            {
+                number: 3,
+                image: null
+            },
+            {
+                number: 4,
+                image: null
+            },
+            {
+                number: 5,
+                image: null
+            },
+            {
+                number: 6,
+                image: null
+            },
+            {
+                number: 7,
+                image: null
+            },
+            {
+                number: 8,
+                image: null
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: null
+            },
+            {
+                number: 2,
+                image: null
+            },
+            {
+                number: 3,
+                image: null
+            },
+            {
+                number: 4,
+                image: null
+            },
+            {
+                number: 5,
+                image: null
+            },
+            {
+                number: 6,
+                image: null
+            },
+            {
+                number: 7,
+                image: null
+            },
+            {
+                number: 8,
+                image: null
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: null
+            },
+            {
+                number: 2,
+                image: null
+            },
+            {
+                number: 3,
+                image: null
+            },
+            {
+                number: 4,
+                image: null
+            },
+            {
+                number: 5,
+                image: null
+            },
+            {
+                number: 6,
+                image: null
+            },
+            {
+                number: 7,
+                image: null
+            },
+            {
+                number: 8,
+                image: null
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: 'pawn.svg'
+            },
+            {
+                number: 2,
+                image: 'pawn.svg'
+            },
+            {
+                number: 3,
+                image: 'pawn.svg'
+            },
+            {
+                number: 4,
+                image: 'pawn.svg'
+            },
+            {
+                number: 5,
+                image: 'pawn.svg'
+            },
+            {
+                number: 6,
+                image: 'pawn.svg'
+            },
+            {
+                number: 7,
+                image: 'pawn.svg'
+            },
+            {
+                number: 8,
+                image: 'pawn.svg'
+            },
+        ],
+        [
+            {
+                number: 1,
+                image: 'rook.svg'
+            },
+            {
+                number: 2,
+                image: 'knight.svg'
+            },
+            {
+                number: 3,
+                image: 'bishop.svg'
+            },
+            {
+                number: 4,
+                image: 'king.svg'
+            },
+            {
+                number: 5,
+                image: 'queen.svg'
+            },
+            {
+                number: 6,
+                image: 'bishop.svg'
+            },
+            {
+                number: 7,
+                image: 'knight.svg'
+            },
+            {
+                number: 8,
+                image: 'rook.svg'
+            },
+        ]
     ],
     over: false,
     moves: 0,

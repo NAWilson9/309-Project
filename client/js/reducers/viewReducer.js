@@ -1,5 +1,5 @@
 export default function reducer(state={
-    page: 'home'
+    page: 'game'
 }, action) {
 
     switch (action.type) {

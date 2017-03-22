@@ -12,7 +12,7 @@ const getStyles = function(props){
     }
 };
 
-const GameView = React.createClass({
+export default class GameView extends React.Component{
     render() {
         return (
             <Grid style={getStyles()}>
@@ -21,7 +21,4 @@ const GameView = React.createClass({
             </Grid>
         );
     }
-});
-
-
-export default GameView;
+};

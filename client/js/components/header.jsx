@@ -2,13 +2,12 @@ import React from 'react'
 import { Menu } from 'semantic-ui-react'
 
 export default class CHSSHeader extends React.Component {
-
     changePage(target){
         this.props.dispatch({
             type: 'changeView',
             payload: target
         });
-    }
+    };
 
     render(){
         return (
