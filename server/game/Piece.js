@@ -1,7 +1,7 @@
 /**
  * Created by ajrmatt on 3/15/17.
  */
-import Movement from './Movement'
+import { Movement, DependentMovement } from './Movement'
 import MovementList from './MovementList'
 
 export default class Piece {
@@ -13,11 +13,20 @@ export default class Piece {
         this.abilities.destinations = generateRelativeLocations(props.movements);
     }
 }
-
 function generateRelativeLocations(movementList) {
     let locations = [];
-    let movement = movementList.first;
-    while (movement !== null) {
+    generateRelativeLocationsRecursive(movementList.first, locations);
+    return locations;
+}
+function generateRelativeLocationsRecursive(movement, locations) {
+    if (movement !== null) {
+        let results = {
+            direction: null,
+            distance: null,
+        };
+        if (movement instanceof DependentMovement) {
+            movement.setFromResults(results);
+        }
         for (let dirIndex in movement.possibleDirections) {
             console.log(movement.possibleDirections[dirIndex]);
             if (movement.possibleDirections[dirIndex] > 0) {
@@ -25,7 +34,6 @@ function generateRelativeLocations(movementList) {
             }
         }
     }
-    return locations;
 }
 function getRelativeLocation(direction, distance) {
     let location = { x: 0, y: 0, };
@@ -74,15 +82,16 @@ export class Knight extends Piece {
                 mustComplete: false,
                 possibleDirections: new DirectionSet(dirSets.orthogonal),
                 maxDistance: 2,
-                perform: (distanceTravelled, results) => {
-
-                },
             }),
-            new Movement({
+            new DependentMovement({
                 mustPerform: true,
                 mustComplete: true,
-                maxDistance: 2,
+                maxDistance: null,
                 possibleDirections: null,
+                setFromResults: (results) => {
+                    this.possibleDirections = this.prev.possibleDirections.removeDirection(results.direction);
+                    this.maxDistance = 2-results.distance;
+                },
             }),
         ]);
         super(props);

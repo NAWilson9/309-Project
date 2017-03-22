@@ -2,7 +2,7 @@
  * Created by ajrmatt on 3/18/17.
  */
 
-export default class Movement {
+export class Movement {
     constructor(props) {
         this.next = null;
         this.prev = null;
@@ -10,14 +10,14 @@ export default class Movement {
         this.mustComplete = props.mustComplete;
         this.possibleDirections = props.possibleDirections;
         this.maxDistance = props.maxDistance;
-        this.perform = (distanceTravelled, results) => {
-            return props.perform(distanceTravelled, results);
-        }
     }
 }
 
-// export class dependentMovement extends Movement {
-//     constructor(props) {
-//         super(props);
-//     }
-// }
+export class DependentMovement extends Movement {
+    constructor(props) {
+        super(props);
+        this.setFromResults = () => {
+
+        }
+    }
+}
