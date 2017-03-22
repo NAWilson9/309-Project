@@ -3,76 +3,101 @@
  */
 import { Movement, DependentMovement } from './Movement'
 import MovementList from './MovementList'
+import D
 
 export default class Piece {
     constructor(props) {
         this.name = props.name;
         this.userID = props.userID;
         this._id = props._id;
+        this.abilities = {};
         this.abilities.movements = props.movements;
         this.abilities.destinations = generateRelativeLocations(props.movements);
     }
 }
 function generateRelativeLocations(movementList) {
-    let locations = [];
-    generateRelativeLocationsRecursive(movementList.first, locations);
-    return locations;
+    let destinations = [];
+    let location = { x: 0, y: 0, };
+    generateRelativeLocationsRecursive(movementList.first, location, destinations);
+    console.log(destinations);
+    return destinations;
 }
-function generateRelativeLocationsRecursive(movement, locations) {
+function generateRelativeLocationsRecursive(movement, currentLocation, destinations) {
     if (movement !== null) {
-        let results = {
-            direction: null,
-            distance: null,
-        };
-        if (movement instanceof DependentMovement) {
-            movement.setFromResults(results);
-        }
-        for (let dirIndex in movement.possibleDirections) {
-            console.log(movement.possibleDirections[dirIndex]);
-            if (movement.possibleDirections[dirIndex] > 0) {
-
+        for (let direction in movement.possibleDirections.set) {
+            // console.log(movement.possibleDirections[direction]);
+            if (movement.possibleDirections.set[direction] > 0) {
+                let location = movement.prev === null ? { x: 0, y: 0, } : currentLocation;
+                for (let distance = 1; distance <= movement.maxDistance; distance++) {
+                    console.log('Distance', distance);
+                    updateRelativeLocation(direction, location);
+                    // console.log(distance, location);
+                    // console.log(movement.next);
+                    // If next movement exists and need not be performed or this is final movement
+                    if (movement.next && !movement.next.mustPerform || !movement.next) {
+                        // console.log('inside movement.next check');
+                        // If distance is not yet max distance and the movement need not be completed or
+                        // distance is max distance
+                        if (distance < movement.maxDistance && !movement.mustComplete ||
+                            distance === movement.maxDistance) {
+                            console.log('Location', location);
+                            destinations.push(location);
+                        }
+                    }
+                    if (movement.next instanceof DependentMovement) {
+                        // console.log('instanceof');
+                        movement.next.setFromResults({
+                            direction: direction,
+                            distance: distance,
+                        });
+                        // console.log(movement.next);
+                    }
+                    generateRelativeLocationsRecursive(movement.next, location, destinations);
+                }
             }
         }
     }
 }
-function getRelativeLocation(direction, distance) {
-    let location = { x: 0, y: 0, };
+function updateRelativeLocation(direction, location) {
+    // let newLocation = Object.assign({}, location);
+    // console.log(direction);
     switch (direction) {
-        case 1 :
-            location.x = -1*distance;
-            location.y = -1*distance;
+        case '0' :
+            // console.log('direction 1');
+            location.x += -1;
+            location.y += -1;
             break;
-        case 2 :
-            location.y = -1*distance;
+        case '1' :
+            location.y += -1;
             break;
-        case 3 :
-            location.x = 1*distance;
-            location.y = -1*distance;
+        case '2' :
+            location.x += 1;
+            location.y += -1;
             break;
-        case 4 :
-            location.x = 1*distance;
+        case '3' :
+            location.x += 1;
             break;
-        case 5 :
-            location.x = 1*distance;
-            location.y = 1*distance;
+        case '4' :
+            location.x += 1;
+            location.y += 1;
             break;
-        case 6 :
-            location.y = 1*distance;
+        case '5' :
+            location.y += 1;
             break;
-        case 7 :
-            location.x = -1*distance;
-            location.y = 1*distance;
+        case '6' :
+            location.x += -1;
+            location.y += 1;
             break;
-        case 8 :
-            location.x = -1*distance;
+        case '7' :
+            location.x += -1;
             break;
     }
-    return location;
+    // return location;
 }
 
-function containsEquivalentObject() {
-
-}
+// function containsEquivalentObject() {
+//
+// }
 
 export class Knight extends Piece {
     constructor(props) {
@@ -88,9 +113,10 @@ export class Knight extends Piece {
                 mustComplete: true,
                 maxDistance: null,
                 possibleDirections: null,
-                setFromResults: (results) => {
-                    this.possibleDirections = this.prev.possibleDirections.removeDirection(results.direction);
-                    this.maxDistance = 2-results.distance;
+                setFromResults: function (results) {
+                    // console.log(this.prev);
+                    this.possibleDirections = this.prev.possibleDirections.copyAndRemoveDirection(results.direction);
+                    this.maxDistance = 3-results.distance;
                 },
             }),
         ]);
@@ -125,25 +151,3 @@ export class Knight extends Piece {
 //         }
 //     }
 // }
-
-/**
- * |1|2|3|
- * |8|P|4|
- * |7|6|5|
- */
-const dirSets = {
-    orthogonal: [0,2,0,4,0,6,0,8],
-    diagonal: [1,0,3,0,5,0,7,0],
-    encroach: [1,2,3,0,0,0,0,0],
-};
-
-export class DirectionSet extends Array {
-    constructor(set) {
-        super(set);
-    }
-    removeDirection(direction) {
-        let newDirections = this.slice();
-        newDirections[direction-1] = 0;
-        return newDirections;
-    }
-}

@@ -36,6 +36,8 @@ let knight = new Knight({
     userID: player1._id,
     _id: '11101000'
 });
+
+
 // let gameResult;
 // while (!gameResult) {
 //     game.move(game.players[0], {from: {x: 2, y: 2}, to: {x: 3, y: 3}});
