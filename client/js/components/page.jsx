@@ -15,7 +15,7 @@ export default class Page  extends React.Component{
         if(this.props.view === 'game'){
             return <GameView/>
         } else {
-            return <section><h1>In progress...</h1></section>;
+            return <section><h1>{this.props.view} page in progress...</h1></section>;
         }
     };
 
