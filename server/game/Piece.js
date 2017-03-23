@@ -3,7 +3,8 @@
  */
 import { Movement, DependentMovement } from './Movement'
 import MovementList from './MovementList'
-import D
+import { DirectionSet, dirSets } from './DirectionSet'
+
 
 export default class Piece {
     constructor(props) {
@@ -18,41 +19,49 @@ export default class Piece {
 function generateRelativeLocations(movementList) {
     let destinations = [];
     let location = { x: 0, y: 0, };
-    generateRelativeLocationsRecursive(movementList.first, location, destinations);
+    for (let direction in movementList.first.possibleDirections.dirSet) {
+        if (movementList.first.possibleDirections.dirSet[direction] > 0) {
+            generateRelativeLocationsRecursive(movementList.first, direction, Object.assign({}, location), destinations);
+        }
+    }
     console.log(destinations);
     return destinations;
 }
-function generateRelativeLocationsRecursive(movement, currentLocation, destinations) {
-    if (movement !== null) {
-        for (let direction in movement.possibleDirections.set) {
-            // console.log(movement.possibleDirections[direction]);
-            if (movement.possibleDirections.set[direction] > 0) {
-                let location = movement.prev === null ? { x: 0, y: 0, } : currentLocation;
-                for (let distance = 1; distance <= movement.maxDistance; distance++) {
-                    console.log('Distance', distance);
-                    updateRelativeLocation(direction, location);
-                    // console.log(distance, location);
+function generateRelativeLocationsRecursive(movement, direction, currentLocation, destinations) {
+    console.log('Direction', direction);
+    // let location = movement.prev === null ? { x: 0, y: 0, } : currentLocation;
+    let location = currentLocation;
+    for (let distance = 1; distance <= movement.maxDistance; distance++) {
+        console.log('Distance', distance);
+        updateRelativeLocation(direction, location);
+        // console.log(distance, location);
+        // If distance is not yet max distance and the movement need not be completed or
+        // distance is max distance
+        if (distance < movement.maxDistance && !movement.mustComplete ||
+            distance === movement.maxDistance) {
+            // console.log(movement.next);
+            // If next movement exists and need not be performed or this is final movement
+            if (movement.next && !movement.next.mustPerform ||
+                !movement.next) {
+                // console.log('inside movement.next check');
+                // console.log('Direction', direction);
+                // console.log('Distance', distance);
+                console.log('Location', location);
+                destinations.push(Object.assign({}, location));
+            }
+            if (movement.next !== null) {
+                if (movement.next instanceof DependentMovement) {
+                    // console.log('instanceof');
+                    movement.next.setFromResults({
+                        direction: direction,
+                        distance: distance,
+                    });
                     // console.log(movement.next);
-                    // If next movement exists and need not be performed or this is final movement
-                    if (movement.next && !movement.next.mustPerform || !movement.next) {
-                        // console.log('inside movement.next check');
-                        // If distance is not yet max distance and the movement need not be completed or
-                        // distance is max distance
-                        if (distance < movement.maxDistance && !movement.mustComplete ||
-                            distance === movement.maxDistance) {
-                            console.log('Location', location);
-                            destinations.push(location);
-                        }
+                }
+                for (let nextDirection in movement.next.possibleDirections.dirSet) {
+                    if (movement.next.possibleDirections.dirSet[nextDirection] > 0) {
+                        generateRelativeLocationsRecursive(movement.next, nextDirection, Object.assign({}, location), destinations);
                     }
-                    if (movement.next instanceof DependentMovement) {
-                        // console.log('instanceof');
-                        movement.next.setFromResults({
-                            direction: direction,
-                            distance: distance,
-                        });
-                        // console.log(movement.next);
-                    }
-                    generateRelativeLocationsRecursive(movement.next, location, destinations);
                 }
             }
         }
@@ -116,6 +125,7 @@ export class Knight extends Piece {
                 setFromResults: function (results) {
                     // console.log(this.prev);
                     this.possibleDirections = this.prev.possibleDirections.copyAndRemoveDirection(results.direction);
+                    // console.log(this.possibleDirections.dirSet);
                     this.maxDistance = 3-results.distance;
                 },
             }),
