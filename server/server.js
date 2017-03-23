@@ -51,6 +51,10 @@ io.listen(app.listen(config.port, function () {
 io.on('connection', function (socket) {
     console.log(new Date().toLocaleTimeString() + ' | A user has connected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
 
+    socket.on('/movePiece', function(data){
+       console.log('MOVEPIECE: ' + JSON.stringify(data));
+    });
+
     socket.on('disconnect', function(){
         console.log(new Date().toLocaleTimeString() + ' | A user has disconnected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
     });

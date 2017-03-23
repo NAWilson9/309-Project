@@ -23,8 +23,6 @@ setInterval(function(){
         type: "move",
         payload: true
     });
-
-    console.log(store.getState());
 }, 3000);
 
 setInterval(function(){

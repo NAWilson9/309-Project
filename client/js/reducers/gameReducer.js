@@ -276,7 +276,9 @@ export default function reducer(state={
     ],
     over: false,
     moves: 0,
-    time: 0
+    time: 0,
+    moveDestination: null,
+    moveStartPosition: null
 }, action) {
 
     switch (action.type) {
@@ -288,6 +290,30 @@ export default function reducer(state={
         }
         case 'tick': {
             return {...state, time: state.time + 1}
+        }
+        case 'pieceMoveDestination': {
+            // console.log('move: ' + action.payload);
+            return {...state, moveDestination: action.payload}
+        }
+        case 'pieceMoveComplete': {
+            // console.log('complete: ' + action.payload);
+            socket.emit('/movePiece', {start: action.payload, end: state.moveDestination});
+
+            let destinationPosition = state.moveDestination.split(',');
+            // let destinationPiece = Object.assign({}, state.board[destinationPosition[0]][destinationPosition[1]]);
+
+            let startingPosition = action.payload.split(',');
+            let startPiece = Object.assign({}, state.board[startingPosition[0]][startingPosition[1]]);
+
+            let board = JSON.parse(JSON.stringify(state.board));
+            board[destinationPosition[0]][destinationPosition[1]] = startPiece;
+            board[startingPosition[0]][startingPosition[1]] =  {
+                number: startPiece.number,
+                image: null
+            };
+            console.log( board[destinationPosition[0]][destinationPosition[1]]);
+
+            return {...state, board: board}
         }
         default: {
             return state
