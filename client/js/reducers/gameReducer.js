@@ -297,21 +297,22 @@ export default function reducer(state={
         }
         case 'pieceMoveComplete': {
             // console.log('complete: ' + action.payload);
+            console.log({start: action.payload, end: state.moveDestination});
             socket.emit('/movePiece', {start: action.payload, end: state.moveDestination});
 
-            let destinationPosition = state.moveDestination.split(',');
+            let destinationPosition = state.moveDestination;//.split(',');
             // let destinationPiece = Object.assign({}, state.board[destinationPosition[0]][destinationPosition[1]]);
 
-            let startingPosition = action.payload.split(',');
-            let startPiece = Object.assign({}, state.board[startingPosition[0]][startingPosition[1]]);
+            let startingPosition = action.payload;//.split(',');
+            let startPiece = Object.assign({}, state.board[startingPosition.y][startingPosition.x]);
 
             let board = JSON.parse(JSON.stringify(state.board));
-            board[destinationPosition[0]][destinationPosition[1]] = startPiece;
-            board[startingPosition[0]][startingPosition[1]] =  {
+            board[destinationPosition.y][destinationPosition.x] = startPiece;
+            board[startingPosition.y][startingPosition.x] =  {
                 number: startPiece.number,
                 image: null
             };
-            console.log( board[destinationPosition[0]][destinationPosition[1]]);
+            console.log( board[destinationPosition.y][destinationPosition.x]);
 
             return {...state, board: board}
         }

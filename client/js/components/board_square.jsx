@@ -23,14 +23,22 @@ export default class BoardSquare extends React.Component{
     dragEnterHandler(ev){
         this.props.dispatch({
             type: "pieceMoveDestination",
-            payload: this.props.rowNumber + ',' + this.props.cellNumber
+            payload: {
+                x: this.props.cellNumber,
+                y: this.props.rowNumber,
+            },
+            // payload: this.props.rowNumber + ',' + this.props.cellNumber
         });
     }
 
     onDragEnd(ev){
         this.props.dispatch({
             type: 'pieceMoveComplete',
-            payload: this.props.rowNumber + ',' + this.props.cellNumber
+            payload: {
+                x: this.props.cellNumber,
+                y: this.props.rowNumber,
+            },
+            // payload: this.props.rowNumber + ',' + this.props.cellNumber
         })
     }
 
