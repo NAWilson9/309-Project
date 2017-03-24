@@ -50,3 +50,5 @@ const playerOwnsPiece = (player, piece) => {
 //     db = database;
 //     return Game;
 // };
+
+// TODO: account for jumping/path obstacles

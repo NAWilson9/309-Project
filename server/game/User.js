@@ -12,5 +12,6 @@ export default class User {
         this.draws = props.draws;
         this.friends = props.friends;
         this._id = props._id;
+        this.isBottomPlayer = props.isBottomPlayer;
     }
 }

@@ -17,5 +17,6 @@ export class DependentMovement extends Movement {
     constructor(props) {
         super(props);
         this.setFromResults = props.setFromResults;
+        this.setFromMoveCount = props.setFromMoveCount;
     }
 }
