@@ -25,6 +25,7 @@ export class DirectionSet {
         // }
         // this.copyAndRemoveDirection = this.handleRemoveDirection.bind(this);
     }
+    // TODO: Make method abstract (currently only works for Knight)
     copyAndRemoveDirection(direction) {
         // console.log(this);
         let newDirectionSet = new DirectionSet(this.dirSet.slice());
@@ -33,6 +34,7 @@ export class DirectionSet {
         newDirectionSet.dirSet[(Number.parseInt(direction)+4)%8] = 0;
         return newDirectionSet;
     }
+    // TODO: Write dynamic direction generation method (for inter-movement dependencies)
 }
 
 export class DependentDirectionSet {

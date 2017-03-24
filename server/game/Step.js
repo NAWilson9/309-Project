@@ -3,8 +3,9 @@
  */
 export default class Step {
     constructor(props) {
-        this.directions = props.directions;
-        this.repsLeft = props.repsLeft;
-
+        this.nextSteps = [];
+        this.prev = props.prev;
+        this.relativeLocation = props.relativeLocation;
+        this.canStopHere = props.canStopHere;
     }
 }

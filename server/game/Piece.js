@@ -4,6 +4,8 @@
 import { Movement, DependentMovement } from './Movement'
 import MovementList from './MovementList'
 import { DirectionSet, dirSets } from './DirectionSet'
+import Step from './Step'
+import StepMap from './StepMap'
 
 
 export default class Piece {
@@ -12,45 +14,55 @@ export default class Piece {
         this.userID = props.userID;
         this._id = props._id;
         this.player = props.player;
+        this.board = null;
         this.moveCount = 0;
         this.abilities = {
             defaultMovementLists: props.defaultMovementLists,
             attackingMovementLists: props.attackingMovementLists,
+            canJump: props.canJump,
         };
-        this.generateRelativeLocations = generateRelativeLocations;
+        this.generateRelativeStepMap = generateRelativeStepMap;
     }
 }
 /**
  * MovementList choice dependent on attacking and numMoves
  *
  */
-function generateRelativeLocations(isAttacking) {
+function generateRelativeStepMap(isAttacking) {
     let destinations = [];
     let location = { x: 0, y: 0, };
     let applicableMovementLists;
     if (isAttacking && this.abilities.attackingMovementLists !== null) applicableMovementLists = this.abilities.attackingMovementLists;
     else applicableMovementLists = this.abilities.defaultMovementLists;
     // console.log(applicableMovementLists);
+    let stepMap = new StepMap();
     for (let movementListIndex in applicableMovementLists) {
         let movementList = applicableMovementLists[movementListIndex];
         for (let direction in movementList.first.possibleDirections.dirSet) {
             if (movementList.first.possibleDirections.dirSet[direction] > 0) {
-                generateRelativeLocationsRecursive(this, movementList.first, direction, Object.assign({}, location), destinations);
+                generateRelativeStepMapRecursive(this, movementList.first, direction, Object.assign({}, location), stepMap.start, destinations);
             }
         }
     }
-    console.log(destinations);
-    return destinations;
+    // console.log(destinations);
+    return stepMap;
 }
-function generateRelativeLocationsRecursive(piece, movement, direction, currentLocation, destinations) {
-    console.log('Direction', direction);
+function generateRelativeStepMapRecursive(piece, movement, direction, currentLocation, prevStep, destinations) {
+    // console.log('Direction', direction);
     if (movement instanceof DependentMovement && movement.setFromMoveCount !== null) {
         movement.setFromMoveCount(piece.moveCount);
     }
     let location = currentLocation;
     for (let distance = 1; distance <= movement.maxDistance; distance++) {
-        console.log('Distance', distance);
+        // console.log('Distance', distance);
         updateRelativeLocation(piece.player, direction, location);
+        let thisStep = new Step({
+            prev: prevStep,
+            relativeLocation: Object.assign({}, location),
+            canStopHere: false,
+        });
+        prevStep.nextSteps.push(thisStep);
+        prevStep = thisStep;
         // If distance is not yet max distance and the movement need not be completed or
         // distance is max distance
         if (distance < movement.maxDistance && !movement.mustComplete ||
@@ -58,7 +70,8 @@ function generateRelativeLocationsRecursive(piece, movement, direction, currentL
             // If next movement exists and need not be performed or this is final movement
             if (movement.next && !movement.next.mustPerform ||
                 !movement.next) {
-                console.log('Location', location);
+                // console.log('Location', location);
+                thisStep.canStopHere = true;
                 if (!containsLocation(destinations, location)) destinations.push(Object.assign({}, location));
             }
             if (movement.next !== null) {
@@ -70,7 +83,7 @@ function generateRelativeLocationsRecursive(piece, movement, direction, currentL
                 }
                 for (let nextDirection in movement.next.possibleDirections.dirSet) {
                     if (movement.next.possibleDirections.dirSet[nextDirection] > 0) {
-                        generateRelativeLocationsRecursive(piece, movement.next, nextDirection, Object.assign({}, location), destinations);
+                        generateRelativeStepMapRecursive(piece, movement.next, nextDirection, Object.assign({}, location), thisStep, destinations);
                     }
                 }
             }
@@ -113,7 +126,7 @@ function updateRelativeLocation(player, direction, location) {
                 break;
         }
     } else {
-        console.log('anything?');
+        // console.log('anything?');
         switch (direction) {
             case '0' :
                 // console.log('direction 1');
@@ -185,6 +198,7 @@ export class Knight extends Piece {
             ]),
         ];
         props.attackingMovementLists = null;
+        props.canJump = true;
         super(props);
     }
 }
@@ -202,6 +216,7 @@ export class Rook extends Piece {
             ]),
         ];
         props.attackingMovementLists = null;
+        props.canJump = false;
         super(props);
     }
 }
@@ -219,6 +234,7 @@ export class Queen extends Piece {
             ]),
         ];
         props.attackingMovementLists = null;
+        props.canJump = false;
         super(props);
     }
 }
@@ -236,6 +252,7 @@ export class King extends Piece {
             ]),
         ];
         props.attackingMovementLists = null;
+        props.canJump = false;
         super(props);
     }
 }
@@ -253,6 +270,7 @@ export class Bishop extends Piece {
             ]),
         ];
         props.attackingMovementLists = null;
+        props.canJump = false;
         super(props);
     }
 }
@@ -284,34 +302,7 @@ export class Pawn extends Piece {
                 }),
             ]),
         ];
+        props.canJump = false;
         super(props);
     }
 }
-
-// export class KnightStep extends Piece {
-//     constructor(props) {
-//         super(props);
-//         this.abilities = {
-//             steps: [
-//                 new Step({
-//                     directions: directionSets.orthogonal,
-//                     repsLeft: 2,
-//                     nextSteps: (directionChosen) => {
-//                         if (this.repsLeft === 0) {
-//                             this.repsLeft = this.repsLeft - 1;
-//                             let directions = this.directions.slice();
-//                             directions[directionChosen-1] = 0;
-//                             return [
-//                                 this,
-//                                 new Step({
-//                                     directions: directions,
-//                                     repsLeft:
-//                                 })
-//                             ]
-//                         }
-//                     },
-//                 })
-//             ],
-//         }
-//     }
-// }
