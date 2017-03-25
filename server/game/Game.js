@@ -9,25 +9,23 @@ export default class Game {
     constructor(props) {
         this.players = props.players;
         this.activePlayer = props.firstPlayer;
+        this.nextPlayer = handleNextPlayer;
         this.gameboard = props.pieceList ? null : generateClassicBoard(this);
-        this.move = movePiece;
-        // this.start = startGame;
-        // this.generateClassicBoard = generateClassicBoard;
+        this.movePiece = handleMovePiece;
     }
 }
 
-// const startGame = function() {
-//
-// };
+const handleNextPlayer = function() {
+    // console.log((game.players.indexOf(game.activePlayer)+1)%game.players.length);
+    // return game.players[(game.players.indexOf(game.activePlayer)+1)%game.players.length];
+    return this.activePlayer === this.players.playerTop ? this.players.playerBottom : this.players.playerTop;
+}
 
-const movePiece = function(movement) {
+const handleMovePiece = function(movement) {
     const from = movement.start;
     const to = movement.end;
     const piece = this.gameboard[from.y][from.x];
     const destinationPiece = this.gameboard[to.y][to.x];
-    // console.log('Piece:', piece);
-    // console.log('Destination piece:', destinationPiece, '\n');
-    // if(player === this.activePlayer) {
     let isAttacking = null;
     if (piece) {
         if (piece.player === this.activePlayer) {
@@ -39,27 +37,32 @@ const movePiece = function(movement) {
             }
             else isAttacking = false;
         } else {
-            console.log('Not your turn');
+            console.log('Not your piece');
         }
     } else {
         console.log('Empty square');
     }
     if (isAttacking !== null) {
-        // console.log('Is attacking:', isAttacking);
         let canMovePiece = canMove(piece, isAttacking, movement, this.gameboard);
-        // console.log('Can move:', canMovePiece);
         if (canMovePiece) {
-            this.gameboard[to.y][to.x] = this.gameboard[from.y][from.x];;
+            if (destinationPiece) {
+                destinationPiece.isInPlay = false;
+                destinationPiece.currentLocation = null;
+            }
+            this.gameboard[to.y][to.x] = piece;
             this.gameboard[from.y][from.x] = null;
-            printBoard(this.gameboard);
+            piece.currentLocation.x = to.x;
+            piece.currentLocation.y = to.y;
+            piece.moveCount++;
+            // console.log('Piece:', piece);
+            // console.log('DestPiece:', destinationPiece);
+            let check = { check: false, checkmate: false, };
+            checkCheckAndCheckmate(this, check);
+            this.activePlayer = this.nextPlayer();
         }
     } else {
 
     }
-    // } else {
-    //     console.log('Not your turn');
-    // }
-    // console.log(db);
 };
 
 function canMove(piece, isAttacking, movement, board) {
@@ -71,8 +74,6 @@ function canMove(piece, isAttacking, movement, board) {
     return canMove.value;
 }
 function canMoveRecursive(piece, step, movement, board, canMove) {
-    // Cut off if
-    // !canJump &&
     let boardMaxX = board[0].length-1;
     let boardMaxY = board.length-1;
     let stepX = movement.start.x + step.relativeLocation.x;
@@ -81,31 +82,25 @@ function canMoveRecursive(piece, step, movement, board, canMove) {
         let stepLocationPiece = board[stepY][stepX];
         let stepIsDestination = (movement.end.x === stepX && movement.end.y === stepY);
         let branch = true;
-        let canMoveHere = false;
+        let canMoveHere = step.canMoveHere;
         if (stepLocationPiece) {
+            if (stepLocationPiece.player === piece.player) {
+                canMoveHere = false;
+            } else {
+                // stepLocationPiece is owned by activePlayer
+            }
             if (!piece.abilities.canJump) {
-                // console.log('Cannot Jump');
-                if (stepLocationPiece.player !== piece.player && step.canStopHere) {
-                    canMoveHere = true;
-                } else {
-                    // stepPiece is owned by activePlayer
-                }
                 branch = false;
             } else {
-                // console.log('Can Jump');
                 //canJump
             }
         } else {
             // Empty square
-            // console.log('Can stop here:', step.canStopHere, '\n', step);
-            if (step.canStopHere) canMoveHere = true;
+            // if (step.canMoveHere) canMoveHere = true;
         }
         if (canMoveHere && stepIsDestination) {
-            // console.log('Step is destination');
             canMove.value = true;
         }
-        // console.log('Branch:', branch);
-        // console.log
         if (branch && !canMove.value) {
             for (let stepIndex in step.nextSteps) {
                 canMoveRecursive(piece, step.nextSteps[stepIndex], movement, board, canMove);
@@ -114,20 +109,59 @@ function canMoveRecursive(piece, step, movement, board, canMove) {
     } else {
         // out of bounds
     }
-    // TODO: account for step.canStopHere
-    // TODO: account for board edges
-    // Check location == movement.end
 }
-// const playerOwnsPiece = (player, piece) => {
-//     return (player === piece.player);
-// };
 
-// module.exports = (database) => {
-//     db = database;
-//     return Game;
-// };
+function checkCheckAndCheckmate(game, check) {
+    let kingDestinations = generatePossibleDestinations(game.nextPlayer().king, game.gameboard);
+    console.log(kingDestinations);
+}
 
-export function printBoard(board) {
+function generatePossibleDestinations(king, board) {
+    let destinations = [];
+    let stepMapDefault = king.generateRelativeStepMap(false);
+    let stepMapAttack = king.generateRelativeStepMap(true);
+    for (let stepIndex in stepMapDefault.start.nextSteps) {
+        generatePossibleDestinationsRecursive(king, stepMapDefault.start.nextSteps[stepIndex], board, destinations);
+    }
+    for (let stepIndex in stepMapAttack.start.nextSteps) {
+        generatePossibleDestinationsRecursive(king, stepMapAttack.start.nextSteps[stepIndex], board, destinations);
+    }
+    return destinations;
+}
+function generatePossibleDestinationsRecursive(king, step, board, destinations) {
+    let boardMaxX = board[0].length-1;
+    let boardMaxY = board.length-1;
+    let stepLocation = {
+        x: king.currentLocation.x + step.relativeLocation.x,
+        y: king.currentLocation.y + step.relativeLocation.y,
+    };
+    if (stepLocation.x >= 0 && stepLocation.x <= boardMaxX && stepLocation.y >= 0 && stepLocation.y <= boardMaxY) {
+        let stepLocationPiece = board[stepLocation.y][stepLocation.x];
+        let branch = true;
+        let canMoveHere = step.canMoveHere;
+        if (stepLocationPiece) {
+            if (stepLocationPiece.player === king.player) canMoveHere = false;
+            if (!king.abilities.canJump) branch = false;
+        }
+        if (canMoveHere && !containsLocation(destinations, stepLocation)) destinations.push(stepLocation);
+        if (branch && !canMoveHere) {
+            for (let stepIndex in step.nextSteps) {
+                generatePossibleDestinationsRecursive(king, step.nextSteps[stepIndex], board, destinations);
+            }
+        }
+    }
+}
+
+function containsLocation(destinations, location) {
+    for (let locIndex in destinations) {
+        let currLoc = destinations[locIndex];
+        if (currLoc.x === location.x && currLoc.y === location.y) return true;
+    }
+    return false;
+}
+
+export function printGame(game) {
+    let board = game.gameboard;
     console.log();
     let topString = '   ';
     for (let colIndex in board[0]) {
@@ -143,110 +177,109 @@ export function printBoard(board) {
         }
         console.log(rowString);
     }
+    console.log(game.activePlayer.username + '\'s turn');
 }
 
-// TODO: account for jumping/path obstacles
-// TODO: account for board edges
 function generateClassicBoard(game) {
-    return [
+    let board = [
         [
             new Rook({
-                name: 'R',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'r',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Knight({
-                name: 'N',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'n',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Bishop({
-                name: 'B',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'b',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Queen({
-                name: 'Q',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'q',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new King({
-                name: 'K',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'k',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Bishop({
-                name: 'B',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'b',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Knight({
-                name: 'N',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'n',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Rook({
-                name: 'R',
-                userID: game.players.playerTop._id,
-                _id: '11001010',
+                name: 'r',
+                // userID: game.players.playerTop._id,
+                // _id: '11001010',
                 player: game.players.playerTop,
             }),
 
         ],
         [
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'P',
-                userID: game.players.playerTop._id,
-                _id: '10010010',
+                name: 'p',
+                // userID: game.players.playerTop._id,
+                // _id: '10010010',
                 player: game.players.playerTop,
             }),
         ],
@@ -265,111 +298,115 @@ function generateClassicBoard(game) {
         [
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
                 name: 'P',
-                userID: game.players.playerBottom._id,
-                _id: '10010010',
+                // userID: game.players.playerBottom._id,
+                // _id: '10010010',
                 player: game.players.playerBottom,
             }),
         ],
         [
             new Rook({
                 name: 'R',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Knight({
                 name: 'N',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Bishop({
                 name: 'B',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Queen({
                 name: 'Q',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new King({
                 name: 'K',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Bishop({
                 name: 'B',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Knight({
                 name: 'N',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Rook({
                 name: 'R',
-                userID: game.players.playerBottom._id,
-                _id: '11001010',
+                // userID: game.players.playerBottom._id,
+                // _id: '11001010',
                 player: game.players.playerBottom,
             }),
-
         ],
     ];
-    // for (let rowIndex in board) {
-    //     let row = board[rowIndex];
-    //     for (let pieceIndex in row) {
-    //         let piece = row[pieceIndex];
-    //         if (piece !== null) piece.board = board;
-    //     }
-    // }
-    // return board;
+    for (let rowIndex in board) {
+        let row = board[rowIndex];
+        for (let pieceIndex in row) {
+            let piece = row[pieceIndex];
+            if (piece !== null) {
+                piece.isInPlay = true;
+                piece.currentLocation = { x: pieceIndex, y: rowIndex, };
+                piece.player.pieces.push(piece);
+                if (piece instanceof King) piece.player.king = piece;
+            }
+        }
+    }
+    return board;
 }

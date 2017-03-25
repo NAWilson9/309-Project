@@ -6,6 +6,6 @@ export default class Step {
         this.nextSteps = [];
         this.prev = props.prev;
         this.relativeLocation = props.relativeLocation;
-        this.canStopHere = props.canStopHere;
+        this.canMoveHere = props.canMoveHere;
     }
 }

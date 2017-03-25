@@ -11,8 +11,8 @@ import StepMap from './StepMap'
 export default class Piece {
     constructor(props) {
         this.name = props.name;
-        this.userID = props.userID;
-        this._id = props._id;
+        // this.userID = props.userID;
+        // this._id = props._id;
         this.player = props.player;
         this.board = null;
         this.moveCount = 0;
@@ -21,6 +21,8 @@ export default class Piece {
             attackingMovementLists: props.attackingMovementLists,
             canJump: props.canJump,
         };
+        this.currentLocation = null;
+        this.isInPlay = null;
         this.generateRelativeStepMap = generateRelativeStepMap;
     }
 }
@@ -34,7 +36,6 @@ function generateRelativeStepMap(isAttacking) {
     let applicableMovementLists;
     if (isAttacking && this.abilities.attackingMovementLists !== null) applicableMovementLists = this.abilities.attackingMovementLists;
     else applicableMovementLists = this.abilities.defaultMovementLists;
-    // console.log(applicableMovementLists);
     let stepMap = new StepMap();
     for (let movementListIndex in applicableMovementLists) {
         let movementList = applicableMovementLists[movementListIndex];
@@ -48,18 +49,16 @@ function generateRelativeStepMap(isAttacking) {
     return stepMap;
 }
 function generateRelativeStepMapRecursive(piece, movement, direction, currentLocation, prevStep, destinations) {
-    // console.log('Direction', direction);
     if (movement instanceof DependentMovement && movement.setFromMoveCount !== null) {
         movement.setFromMoveCount(piece.moveCount);
     }
     let location = currentLocation;
     for (let distance = 1; distance <= movement.maxDistance; distance++) {
-        // console.log('Distance', distance);
         updateRelativeLocation(piece.player, direction, location);
         let thisStep = new Step({
             prev: prevStep,
             relativeLocation: Object.assign({}, location),
-            canStopHere: false,
+            canMoveHere: false,
         });
         prevStep.nextSteps.push(thisStep);
         prevStep = thisStep;
@@ -70,8 +69,7 @@ function generateRelativeStepMapRecursive(piece, movement, direction, currentLoc
             // If next movement exists and need not be performed or this is final movement
             if (movement.next && !movement.next.mustPerform ||
                 !movement.next) {
-                // console.log('Location', location);
-                thisStep.canStopHere = true;
+                thisStep.canMoveHere = true;
                 if (!containsLocation(destinations, location)) destinations.push(Object.assign({}, location));
             }
             if (movement.next !== null) {
@@ -91,12 +89,9 @@ function generateRelativeStepMapRecursive(piece, movement, direction, currentLoc
     }
 }
 function updateRelativeLocation(player, direction, location) {
-    // let newLocation = Object.assign({}, location);
-    // console.log(direction);
     if (player.isBottomPlayer) {
         switch (direction) {
             case '0' :
-                // console.log('direction 1');
                 location.x += -1;
                 location.y += -1;
                 break;
@@ -126,10 +121,8 @@ function updateRelativeLocation(player, direction, location) {
                 break;
         }
     } else {
-        // console.log('anything?');
         switch (direction) {
             case '0' :
-                // console.log('direction 1');
                 location.x += 1;
                 location.y += 1;
                 break;
@@ -159,7 +152,6 @@ function updateRelativeLocation(player, direction, location) {
                 break;
         }
     }
-    // return location;
 }
 
 function containsLocation(destinations, location) {
@@ -188,9 +180,7 @@ export class Knight extends Piece {
                     isResultDependent: true,
                     isMoveCountDependent: false,
                     setFromResults: function (results) {
-                        // console.log(this.prev);
                         this.possibleDirections = this.prev.possibleDirections.copyAndRemoveDirection(results.direction);
-                        // console.log(this.possibleDirections.dirSet);
                         this.maxDistance = 3-results.distance;
                     },
                     setFromMoveCount: null,
@@ -286,7 +276,6 @@ export class Pawn extends Piece {
                     maxDistance: null,
                     setFromResults: null,
                     setFromMoveCount: function (moveCount) {
-                        // console.log('NumMoves', moveCount);
                         this.maxDistance = moveCount > 0 ? 1 : 2;
                     },
                 }),
