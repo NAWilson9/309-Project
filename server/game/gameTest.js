@@ -9,7 +9,7 @@ import ConsoleGame from './ConsoleGame'
 
 
 let playerBottom = new Player({
-    username: 'Ajrmatt',
+    username: 'Player 1',
     // password: '1234',
     // rating: 0,
     // wins: 0,
@@ -20,7 +20,7 @@ let playerBottom = new Player({
     isBottomPlayer: true,
 });
 let playerTop = new Player({
-    username: 'Jmatthews',
+    username: 'Player 2',
     // password: '4321',
     // rating: 0,
     // wins: 0,
