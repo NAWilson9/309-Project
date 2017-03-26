@@ -14,7 +14,10 @@ export default class Player {
         // this._id = props._id;
 
         this.isBottomPlayer = props.isBottomPlayer;
+        this.opponent = null;
         this.pieces = [];
         this.king = null;
+        this.isInCheck = false;
+        this.isInCheckmate = false;
     }
 }

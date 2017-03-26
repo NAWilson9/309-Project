@@ -8,6 +8,8 @@ import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
 export default class Game {
     constructor(props) {
         this.players = props.players;
+        this.players.playerTop.opponent = this.players.playerBottom;
+        this.players.playerBottom.opponent = this.players.playerTop;
         this.activePlayer = props.firstPlayer;
         this.nextPlayer = handleNextPlayer;
         this.gameboard = props.pieceList ? null : generateClassicBoard(this);
@@ -17,9 +19,10 @@ export default class Game {
 
 const handleNextPlayer = function() {
     // console.log((game.players.indexOf(game.activePlayer)+1)%game.players.length);
+    // Generalization for more players (may not be working as is)
     // return game.players[(game.players.indexOf(game.activePlayer)+1)%game.players.length];
     return this.activePlayer === this.players.playerTop ? this.players.playerBottom : this.players.playerTop;
-}
+};
 
 const handleMovePiece = function(movement) {
     const from = movement.start;
@@ -43,7 +46,8 @@ const handleMovePiece = function(movement) {
         console.log('Empty square');
     }
     if (isAttacking !== null) {
-        let canMovePiece = canMove(piece, isAttacking, movement, this.gameboard);
+        let destinations = [to];
+        let canMovePiece = canMove(piece, isAttacking, destinations, this.gameboard);
         if (canMovePiece) {
             if (destinationPiece) {
                 destinationPiece.isInPlay = false;
@@ -56,8 +60,8 @@ const handleMovePiece = function(movement) {
             piece.moveCount++;
             // console.log('Piece:', piece);
             // console.log('DestPiece:', destinationPiece);
-            let check = { check: false, checkmate: false, };
-            checkCheckAndCheckmate(this, check);
+            updateCheckAndCheckmate(this);
+            console.log(this.activePlayer.isInCheck, this.nextPlayer().isInCheck);
             this.activePlayer = this.nextPlayer();
         }
     } else {
@@ -65,22 +69,24 @@ const handleMovePiece = function(movement) {
     }
 };
 
-function canMove(piece, isAttacking, movement, board) {
+function canMove(piece, isAttacking, destinations, board) {
     let canMove = { value: false, };
     let stepMap = piece.generateRelativeStepMap(isAttacking);
     for (let stepIndex in stepMap.start.nextSteps) {
-        canMoveRecursive(piece, stepMap.start.nextSteps[stepIndex], movement, board, canMove);
+        canMoveRecursive(piece, stepMap.start.nextSteps[stepIndex], destinations, board, canMove);
     }
     return canMove.value;
 }
-function canMoveRecursive(piece, step, movement, board, canMove) {
+function canMoveRecursive(piece, step, destinations, board, canMove) {
     let boardMaxX = board[0].length-1;
     let boardMaxY = board.length-1;
-    let stepX = movement.start.x + step.relativeLocation.x;
-    let stepY = movement.start.y + step.relativeLocation.y;
-    if (stepX >= 0 && stepX <= boardMaxX && stepY >= 0 && stepY <= boardMaxY) {
-        let stepLocationPiece = board[stepY][stepX];
-        let stepIsDestination = (movement.end.x === stepX && movement.end.y === stepY);
+    let stepLocation = {
+        x: piece.currentLocation.x + step.relativeLocation.x,
+        y: piece.currentLocation.y + step.relativeLocation.y,
+    };
+    if (stepLocation.x >= 0 && stepLocation.x <= boardMaxX && stepLocation.y >= 0 && stepLocation.y <= boardMaxY) {
+        let stepLocationPiece = board[stepLocation.y][stepLocation.x];
+        let stepIsDestination = containsLocation(destinations, stepLocation);
         let branch = true;
         let canMoveHere = step.canMoveHere;
         if (stepLocationPiece) {
@@ -103,7 +109,7 @@ function canMoveRecursive(piece, step, movement, board, canMove) {
         }
         if (branch && !canMove.value) {
             for (let stepIndex in step.nextSteps) {
-                canMoveRecursive(piece, step.nextSteps[stepIndex], movement, board, canMove);
+                canMoveRecursive(piece, step.nextSteps[stepIndex], destinations, board, canMove);
             }
         }
     } else {
@@ -111,9 +117,23 @@ function canMoveRecursive(piece, step, movement, board, canMove) {
     }
 }
 
-function checkCheckAndCheckmate(game, check) {
-    let kingDestinations = generatePossibleDestinations(game.nextPlayer().king, game.gameboard);
-    console.log(kingDestinations);
+function updateCheckAndCheckmate(game) {
+    let kingDestinations;
+    for (let playerProp in game.players) {
+        if (game.players.hasOwnProperty(playerProp)) {
+            let player = game.players[playerProp];
+            kingDestinations = generatePossibleDestinations(player.king, game.gameboard);
+            let inCheck = false;
+            let kingCannotMove = false;
+            for (let pieceIndex in player.opponent.pieces) {
+                let piece = player.opponent.pieces[pieceIndex];
+                if (piece.currentLocation && canMove(piece, true, [player.king.currentLocation], game.gameboard)) inCheck = true;
+            }
+            player.isInCheck = inCheck;
+        }
+    }
+    // console.log(kingDestinations);
+
 }
 
 function generatePossibleDestinations(king, board) {
@@ -136,6 +156,7 @@ function generatePossibleDestinationsRecursive(king, step, board, destinations) 
         y: king.currentLocation.y + step.relativeLocation.y,
     };
     if (stepLocation.x >= 0 && stepLocation.x <= boardMaxX && stepLocation.y >= 0 && stepLocation.y <= boardMaxY) {
+        // console.log('In Bounds');
         let stepLocationPiece = board[stepLocation.y][stepLocation.x];
         let branch = true;
         let canMoveHere = step.canMoveHere;
@@ -402,7 +423,7 @@ function generateClassicBoard(game) {
             let piece = row[pieceIndex];
             if (piece !== null) {
                 piece.isInPlay = true;
-                piece.currentLocation = { x: pieceIndex, y: rowIndex, };
+                piece.currentLocation = { x: parseInt(pieceIndex), y: parseInt(rowIndex), };
                 piece.player.pieces.push(piece);
                 if (piece instanceof King) piece.player.king = piece;
             }
