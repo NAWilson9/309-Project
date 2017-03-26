@@ -18,5 +18,6 @@ export class DependentMovement extends Movement {
         super(props);
         this.setFromResults = props.setFromResults;
         this.setFromMoveCount = props.setFromMoveCount;
+        this.setFromBoardSize = props.setFromBoardSize;
     }
 }

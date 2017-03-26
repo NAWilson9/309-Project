@@ -22,15 +22,14 @@ export default class Piece {
             canJump: props.canJump,
         };
         this.currentLocation = null;
-        this.isInPlay = null;
-        this.generateRelativeStepMap = generateRelativeStepMap;
+        this.generateRelativeStepMap = handleGenerateRelativeStepMap;
     }
 }
 /**
  * MovementList choice dependent on attacking and numMoves
  *
  */
-function generateRelativeStepMap(isAttacking) {
+function handleGenerateRelativeStepMap(isAttacking) {
     let destinations = [];
     let location = { x: 0, y: 0, };
     let applicableMovementLists;
@@ -49,8 +48,11 @@ function generateRelativeStepMap(isAttacking) {
     return stepMap;
 }
 function generateRelativeStepMapRecursive(piece, movement, direction, currentLocation, prevStep, destinations) {
-    if (movement instanceof DependentMovement && movement.setFromMoveCount !== null) {
-        movement.setFromMoveCount(piece.moveCount);
+    if (movement instanceof DependentMovement) {
+        if (movement.setFromMoveCount !== null) movement.setFromMoveCount(piece.moveCount);
+        // Because board size is static, this could be set once, but would require more refactoring than time allows
+        //   (iterate movements to set upon board creation is one option)
+        if (movement.setFromBoardSize !== null) movement.setFromBoardSize(piece.board);
     }
     let location = currentLocation;
     for (let distance = 1; distance <= movement.maxDistance; distance++) {
@@ -177,13 +179,12 @@ export class Knight extends Piece {
                     mustComplete: true,
                     maxDistance: null,
                     possibleDirections: null,
-                    isResultDependent: true,
-                    isMoveCountDependent: false,
                     setFromResults: function (results) {
                         this.possibleDirections = this.prev.possibleDirections.copyAndRemoveDirection(results.direction);
                         this.maxDistance = 3-results.distance;
                     },
                     setFromMoveCount: null,
+                    setFromBoardSize: null,
                 }),
             ]),
         ];
@@ -197,11 +198,16 @@ export class Rook extends Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
-                new Movement({
+                new DependentMovement({
                     mustPerform: true,
                     mustComplete: false,
                     possibleDirections: new DirectionSet(dirSets.orthogonal),
-                    maxDistance: 7,
+                    maxDistance: null,
+                    setFromResults: null,
+                    setFromMoveCount: null,
+                    setFromBoardSize: function (board) {
+                        this.maxDistance = Math.max(board.length-1, board[0].length-1);
+                    },
                 }),
             ]),
         ];
@@ -215,11 +221,16 @@ export class Queen extends Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
-                new Movement({
+                new DependentMovement({
                     mustPerform: true,
                     mustComplete: false,
                     possibleDirections: new DirectionSet(dirSets.all),
-                    maxDistance: 7,
+                    maxDistance: null,
+                    setFromResults: null,
+                    setFromMoveCount: null,
+                    setFromBoardSize: function (board) {
+                        this.maxDistance = Math.max(board.length-1, board[0].length-1);
+                    },
                 }),
             ]),
         ];
@@ -251,11 +262,16 @@ export class Bishop extends Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
-                new Movement({
+                new DependentMovement({
                     mustPerform: true,
                     mustComplete: false,
                     possibleDirections: new DirectionSet(dirSets.diagonal),
                     maxDistance: 7,
+                    setFromResults: null,
+                    setFromMoveCount: null,
+                    setFromBoardSize: function (board) {
+                        this.maxDistance = Math.max(board.length-1, board[0].length-1);
+                    },
                 }),
             ]),
         ];
@@ -278,6 +294,7 @@ export class Pawn extends Piece {
                     setFromMoveCount: function (moveCount) {
                         this.maxDistance = moveCount > 0 ? 1 : 2;
                     },
+                    setFromBoardSize: null,
                 }),
             ]),
         ];

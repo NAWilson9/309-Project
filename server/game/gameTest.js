@@ -1,17 +1,12 @@
 /**
  * Created by ajrmatt on 3/16/17.
  */
-import Game, { printGame } from './Game'
 import Player from './Player'
-import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
-import Util from 'util'
+import Game from './Game'
+import ConsoleGame from './ConsoleGame'
+// import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
+// import Util from 'util'
 
-const readline = require('readline');
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 
 let playerBottom = new Player({
     username: 'Ajrmatt',
@@ -43,29 +38,9 @@ let game = new Game({
     firstPlayer: playerBottom,
 });
 
-startConsoleGame();
+const consoleGame = new ConsoleGame(game);
 
-function startConsoleGame() {
-    printGame(game);
-    rl.question('From: ', function(fromResponse) {
-        let fromResponseArray = fromResponse.split(',');
-        rl.question('To: ', function(toResponse) {
-            let toResponseArray = toResponse.split(',');
-            // console.log(fromResponseArray, toResponseArray);
-            game.movePiece({
-                start: {
-                    x: parseInt(fromResponseArray[0]),
-                    y: parseInt(fromResponseArray[1]),
-                },
-                end: {
-                    x: parseInt(toResponseArray[0]),
-                    y: parseInt(toResponseArray[1]),
-                },
-            });
-            startConsoleGame();
-        });
-    });
-}
+consoleGame.start();
 
 // console.log(game.gameboard);
 // game.gameboard[5][2] = new Pawn({
@@ -185,10 +160,3 @@ function startConsoleGame() {
 // for (let stepIndex in stepMap.start.nextSteps[0].nextSteps) {
 //     console.log(Util.inspect(stepMap.start.nextSteps[0].nextSteps[stepIndex], {depth: 4}));
 // }
-
-// let gameResult;
-// while (!gameResult) {
-//     game.movePiece(game.players[0], {from: {x: 2, y: 2}, to: {x: 3, y: 3}});
-//     gameResult = "draw";
-// }
-
