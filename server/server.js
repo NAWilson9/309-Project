@@ -47,12 +47,67 @@ io.listen(app.listen(config.port, function () {
     console.log(new Date().toLocaleTimeString() + ' | ' + config.server_name + ' Express server running on port ' + config.port);
 }));
 
+let usersSearching = []; //Todo: better name
+let games = []; //Todo: better name
+
+
+function gameIDGenerator(){
+    let key = keyGen();
+    while(games.includes(key)) key = keyGen();
+    return key;
+}
+
+function keyGen(){
+    let key = "game";
+    const possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+    for(let i = 0; i < 10; i++ ){
+        key += possible[Math.floor(Math.random() * possible.length)];
+    }
+    return key;
+}
+
+function getGameRoom(socket){
+    return Object.keys(socket.adapter.rooms).find(function(room){
+        return room.startsWith('game');
+    });
+}
+
 //Socket routing
 io.on('connection', function (socket) {
     console.log(new Date().toLocaleTimeString() + ' | A user has connected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
 
-    socket.on('/movePiece', function(data){
-       console.log('MOVEPIECE: ' + JSON.stringify(data));
+    socket.on('searchForGame', function(callback){
+        if(usersSearching.length > 0){
+            let roomName = gameIDGenerator();
+            socket.join(roomName);
+            usersSearching.shift().join(roomName);
+            //Todo: Create new game instance
+            console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
+        } else {
+            usersSearching.push(socket);
+            callback(true); //Todo: figure out what this should be
+            console.log(new Date().toLocaleTimeString() + ' | A user has been added to the search queue.');
+        }
+    });
+
+    socket.on('leaveGame', function () {
+        let gameRoom = getGameRoom(socket);
+        if(gameRoom){
+            //Todo: Handle game logic
+            let socketObj = io.sockets.adapter.rooms[gameRoom].sockets;
+            for (let id of Object.keys(socketObj)) { //Removes all clients from the room.
+                io.sockets.connected[id].leave(gameRoom);
+            }
+            console.log(new Date().toLocaleTimeString() + ' | A game has been ended.');
+        }
+    });
+
+    socket.on('movePiece', function (data) {
+       //Todo: handle game update
+    });
+
+    socket.on('chat', function(message){
+        io.in(getGameRoom(socket)).emit('chat', message);
     });
 
     socket.on('disconnect', function(){
