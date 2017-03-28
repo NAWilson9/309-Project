@@ -2,8 +2,8 @@
  * Created by ajrmatt on 3/16/17.
  */
 // let db;
-import Board from './Board'
 import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
+import GameState from './GameState'
 
 export default class Game {
     constructor(props) {
@@ -14,8 +14,18 @@ export default class Game {
         this.nextPlayer = handleNextPlayer;
         this.gameboard = props.pieceList ? null : generateClassicBoard(this);
         this.movePiece = handleMovePiece;
+        this.getGameState = handleGetGameState;
+        this.latestMovement = {
+            request: null,
+            successful: null,
+            errMsg: null,
+        };
     }
 }
+
+const handleGetGameState = function() {
+    return new GameState(this);
+};
 
 const handleNextPlayer = function() {
     // console.log((game.players.indexOf(game.activePlayer)+1)%game.players.length);
@@ -25,6 +35,7 @@ const handleNextPlayer = function() {
 };
 
 const handleMovePiece = function(movement) {
+    this.latestMovement.request = movement;
     const from = movement.start;
     const to = movement.end;
     if (from.x >= 0 && from.x < this.gameboard[0].length && from.y >= 0 && from.y < this.gameboard.length &&
@@ -33,6 +44,7 @@ const handleMovePiece = function(movement) {
         const destinationPiece = this.gameboard[to.y][to.x];
         let isAttacking = null;
         if (piece) {
+            // Could move this check to outside this scope
             if (piece.player === this.activePlayer) {
                 if (destinationPiece) {
                     if (destinationPiece.player === piece.player) {
@@ -42,14 +54,15 @@ const handleMovePiece = function(movement) {
                 }
                 else isAttacking = false;
             } else {
-                console.log('Not your piece');
+                console.log('Not active player\'s piece');
             }
         } else {
             console.log('Empty square');
         }
         if (isAttacking !== null) {
             let destinations = [to];
-            let canMovePiece = canMove(piece, isAttacking, destinations);
+            let errMsg = { value: null };
+            let canMovePiece = canMove(piece, isAttacking, destinations, errMsg);
             if (canMovePiece) {
                 if (destinationPiece) {
                     destinationPiece.isInPlay = false;
@@ -73,47 +86,52 @@ const handleMovePiece = function(movement) {
     }
 };
 
-function canMove(piece, isAttacking, destinations) {
-    let canMove = { value: false, };
+function canMove(piece, isAttacking, destinations, errMsg) {
+    let results = { canMove: false, errMsg: null };
     let stepMap = piece.generateRelativeStepMap(isAttacking);
     for (let stepIndex in stepMap.start.nextSteps) {
-        canMoveRecursive(piece, stepMap.start.nextSteps[stepIndex], destinations, canMove);
+        canMoveRecursive(piece, stepMap.start.nextSteps[stepIndex], destinations, results);
     }
-    return canMove.value;
+    if (errMsg) errMsg.value = results.errMsg;
+    return results.canMove;
 }
-function canMoveRecursive(piece, step, destinations, canMove) {
+function canMoveRecursive(piece, step, destinations, results) {
     let boardMaxX = piece.board[0].length-1;
     let boardMaxY = piece.board.length-1;
     let stepLocation = {
         x: piece.currentLocation.x + step.relativeLocation.x,
         y: piece.currentLocation.y + step.relativeLocation.y,
     };
+    // For errMsg, generate stepList of path until destination reached
+    // Check destination never reached, check if blocked by other piece
     if (stepLocation.x >= 0 && stepLocation.x <= boardMaxX && stepLocation.y >= 0 && stepLocation.y <= boardMaxY) {
         let stepLocationPiece = piece.board[stepLocation.y][stepLocation.x];
         let stepIsDestination = containsLocation(destinations, stepLocation);
-        let branch = true;
+        let canBranch = true;
         let canMoveHere = step.canMoveHere;
         if (stepLocationPiece) {
             if (stepLocationPiece.player === piece.player) {
                 canMoveHere = false;
             } else {
-                // stepLocationPiece is owned by activePlayer
+                // stepLocationPiece is owned by opponent
             }
             if (!piece.abilities.canJump) {
-                branch = false;
+                canBranch = false;
             } else {
                 //canJump
             }
         } else {
             // Empty square
-            // if (step.canMoveHere) canMoveHere = true;
         }
-        if (canMoveHere && stepIsDestination) {
-            canMove.value = true;
+        if (stepIsDestination) {
+            if (canMoveHere) {
+                results.canMove = true;
+                results.errMsg = null;
+            }
         }
-        if (branch && !canMove.value) {
+        if (canBranch && !results.canMove) {
             for (let stepIndex in step.nextSteps) {
-                canMoveRecursive(piece, step.nextSteps[stepIndex], destinations, canMove);
+                canMoveRecursive(piece, step.nextSteps[stepIndex], destinations, results);
             }
         }
     } else {
