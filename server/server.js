@@ -76,16 +76,17 @@ function getGameRoom(socket){
 io.on('connection', function (socket) {
     console.log(new Date().toLocaleTimeString() + ' | A user has connected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
 
-    socket.on('searchForGame', function(callback){
+    socket.on('findGame', function(callback){
         if(usersSearching.length > 0){
             let roomName = gameIDGenerator();
             socket.join(roomName);
             usersSearching.shift().join(roomName);
             //Todo: Create new game instance
+            io.in(roomName).emit('gameFound', null);
             console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
         } else {
             usersSearching.push(socket);
-            callback(true); //Todo: figure out what this should be
+            // callback(true); //Todo: figure out what this should be
             console.log(new Date().toLocaleTimeString() + ' | A user has been added to the search queue.');
         }
     });

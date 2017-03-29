@@ -1,10 +1,10 @@
 export default function reducer(state={
-    page: 'game'
+    current: 'home'
 }, action) {
 
     switch (action.type) {
         case 'changeView': {
-            return {...state, page: action.payload}
+            return {...state, current: action.payload}
         } default: {
             return state
         }

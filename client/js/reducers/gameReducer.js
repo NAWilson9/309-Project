@@ -1,4 +1,5 @@
 export default function reducer(state={
+    //Todo: Get rid of the junk
     players: [],
     board: [
         [
@@ -278,18 +279,20 @@ export default function reducer(state={
     moves: 0,
     time: 0,
     moveDestination: null,
-    moveStartPosition: null
+    moveStartPosition: null,
+    inGame: false,
+    inQueue: false
 }, action) {
 
     switch (action.type) {
-        case "gg": {
-            return {...state, over: !state.over}
+        case 'findGame': {
+            return {...state, inQueue: true}
         }
-        case 'move': {
-            return {...state, moves: state.moves + 1}
+        case 'cancelGameSearch': {
+            return {...state, inQueue: false}
         }
-        case 'tick': {
-            return {...state, time: state.time + 1}
+        case 'gameFound': {
+            return {...state, inGame: true, inQueue: false}
         }
         case 'pieceMoveDestination': {
             // console.log('move: ' + action.payload);
