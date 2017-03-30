@@ -86,9 +86,16 @@ io.on('connection', function (socket) {
             console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
         } else {
             usersSearching.push(socket);
-            // callback(true); //Todo: figure out what this should be
+            callback(false); //Todo: figure out what this should be
             console.log(new Date().toLocaleTimeString() + ' | A user has been added to the search queue.');
         }
+    });
+
+    socket.on('cancelGameSearch', function(){
+        usersSearching = usersSearching.filter(function (user) {
+            return user !== socket;
+        });
+        console.log(new Date().toLocaleTimeString() + ' | A user has been removed from the search queue.');
     });
 
     socket.on('leaveGame', function () {

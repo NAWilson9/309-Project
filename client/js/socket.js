@@ -5,10 +5,17 @@ export default socket;
 
 // Request handlers
 export function findGame(){
-    socket.emit('findGame');
-    store.dispatch({
-        type: 'findGame',
-        payload: null
+    socket.emit('findGame', function(result){
+        //Result is false if the user was placed in queue.
+        //Result is true if the user was immediately placed in a game.
+        //This check is used to prevent the loading components from flickering
+        //on the screen before the game board loads.
+        if(!result){
+            store.dispatch({
+                type: 'findGame',
+                payload: null
+            });
+        }
     });
 }
 

@@ -285,15 +285,6 @@ export default function reducer(state={
 }, action) {
 
     switch (action.type) {
-        case 'findGame': {
-            return {...state, inQueue: true}
-        }
-        case 'cancelGameSearch': {
-            return {...state, inQueue: false}
-        }
-        case 'gameFound': {
-            return {...state, inGame: true, inQueue: false}
-        }
         case 'pieceMoveDestination': {
             // console.log('move: ' + action.payload);
             return {...state, moveDestination: action.payload}

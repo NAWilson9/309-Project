@@ -1,35 +1,29 @@
 import React from 'react'
-import { Button, Dimmer, Loader, Segment } from 'semantic-ui-react'
-import { findGame } from '../socket.js'
+import { connect } from "react-redux"
+import { Button, Grid, Loader } from 'semantic-ui-react'
+import { cancelGameSearch, findGame } from '../socket.js'
 
-
-const getStyles = function(props){
+@connect((store) => {
     return {
-        // marginLeft: '14px',
-        // marginRight: '14px',
-        // marginTop: '14px'
-    }
-};
-
+        inQueue: store.view.inQueue
+    };
+})
 export default class FindGameView extends React.Component{
     render() {
-        let comp;
-        if(this.props.inQueue){
-            comp = (
-                <Segment>
-                    <Dimmer active>
-                        <Loader>In Queue...</Loader>
-                    </Dimmer>
-                </Segment>
-            );
-        } else {
-            comp = <Button onClick={findGame}>Find a Game</Button>
-        }
-
         return (
-            <div style={getStyles()}>
-                {comp}
-            </div>
+            <Grid textAlign='center' verticalAlign='middle' style={{height: "100%"}}>
+                <Grid.Row>
+                    <Grid.Column>
+                        <h1 style={{fontSize: "550%"}}>Find a Game</h1>
+                        {!this.props.inQueue &&
+                            <Button color='green' size="massive" onClick={findGame}>Enter Queue</Button>}
+                        {this.props.inQueue &&
+                            <Loader active inline='centered' size='massive' style={{marginBottom: '30px'}}>Searching...</Loader>}
+                        {this.props.inQueue &&
+                            <Button color='red' size="massive" onClick={cancelGameSearch}>Leave Queue</Button>}
+                    </Grid.Column>
+                </Grid.Row>
+            </Grid>
         );
     }
 };
