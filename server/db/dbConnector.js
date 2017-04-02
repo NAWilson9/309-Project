@@ -106,6 +106,7 @@ const dbErrMsg = {
     improperIDFormat: 'Improper ID format',
     noID: 'Must specify item ID',
     collCreation: 'Error creating collection:',
+    collDeletion: 'Error deleting collection:',
     collList: 'Error listing collections:',
     connect: 'Failure connecting to database',
 };
@@ -271,6 +272,15 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
     } else dbRespond(callback, dbErrMsg.noQueryData);
 };
 
+/**
+ * Remove the collection with the given name from database
+ * @private
+ * @param {string} collectionName Collection to remove
+ */
+const removeCollection = (collectionName) => {
+    db.dropCollection(collectionName).catch((err) => console.error(dbErrMsg.collDeletion, err));
+};
+
 const dataAccess = {
     /**
      * Create new User item in database from given valid User object
@@ -280,6 +290,11 @@ const dataAccess = {
      * @param {function} callback
      */
     createUser: (user, callback) => {
+        user.rating = 0;
+        user.wins = 0;
+        user.losses = 0;
+        user.draws = 0;
+        user.friends = [];
         createItem(user, dbSchemas.user, dbCollNames.user, callback);
     },
     /**
@@ -321,6 +336,14 @@ const dataAccess = {
      */
     deleteUserByID: (userID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
+    },
+    /**
+     * Delete all User objects from database
+     * Calls {@link module:dbConnector~removeCollection}
+     * @memberOf module:dbConnector
+     */
+    deleteAllUsers: () => {
+        removeCollection(dbCollNames.user);
     },
 
     /**
@@ -373,6 +396,14 @@ const dataAccess = {
     deletePieceByID: (pieceID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, pieceID), dbCollNames.piece, callback);
     },
+    /**
+     * Delete all Piece objects from database
+     * Calls {@link module:dbConnector~removeCollection}
+     * @memberOf module:dbConnector
+     */
+    deleteAllPieces: () => {
+        removeCollection(dbCollNames.piece);
+    },
 
     /**
      * Create new Gameboard item in database from given valid Gameboard object
@@ -424,6 +455,14 @@ const dataAccess = {
     deleteGameboardByID: (gameboardID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, gameboardID), dbCollNames.gameboard, callback);
     },
+    /**
+     * Delete all Gameboard objects from database
+     * Calls {@link module:dbConnector~removeCollection}
+     * @memberOf module:dbConnector
+     */
+    deleteAllGameboards: () => {
+        removeCollection(dbCollNames.gameboard);
+    },
 
     /**
      * Create new Gamestate item in database from given valid Gameboard object
@@ -465,6 +504,14 @@ const dataAccess = {
     deleteGamestateByID: (gamestateID, callback) => {
         deleteItemByKeyValue(createKeyValuePair(IDKey, gamestateID), dbCollNames.gamestate, callback);
     },
+    /**
+     * Delete all GameState objects from database
+     * Calls {@link module:dbConnector~removeCollection}
+     * @memberOf module:dbConnector
+     */
+    deleteAllGamestates: () => {
+        removeCollection(dbCollNames.gamestate);
+    },
 };
 
 const connection = {
@@ -474,13 +521,14 @@ const connection = {
      * @param {object} app Express app that will use database dependent modules
      * @param {string} host Database host address
      * @param {array} dependentModules Array of modules functions to be called with the database object as a parameter
+     * @param {function} callback Called with db object as parameter
      */
-    connect: function (app, host, dependentModules) {
+    connect: function (app, host, dependentModules, callback) {
         mongodb.MongoClient.connect(host, (err, db) => {
             if (err) {
                 console.error(dbErrMsg.connect);
                 setTimeout(() => {
-                    this.connect(app, host, dependentModules);
+                    this.connect(app, host, dependentModules, callback);
                 }, 5000);
                 return;
             }
@@ -488,6 +536,7 @@ const connection = {
             for (let moduleIndex in dependentModules) {
                 app.use(dependentModules[moduleIndex](db));
             }
+            callback(db);
         });
     },
 };
@@ -501,15 +550,15 @@ const connection = {
 module.exports = (database) => {
     if (database) {
         db = database;
-        // Create any Database Collections not present
-        db.listCollections().toArray().then((res) => {
-            let names = [];
-            res.forEach((coll) => names.push(coll.name));
-            Object.keys(dbCollNames).forEach((collNameKey) => {
-                if (!names.includes(dbCollNames[collNameKey]))
-                    db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation, err));
-            });
-        }, (err) => console.error(dbErrMsg.collList, err));
+        // Create any Database Collections not present (not necessary because collections are created when nonexistent and accessed)
+        // db.listCollections().toArray().then((res) => {
+        //     let names = [];
+        //     res.forEach((coll) => names.push(coll.name));
+        //     Object.keys(dbCollNames).forEach((collNameKey) => {
+        //         if (!names.includes(dbCollNames[collNameKey]))
+        //             db.createCollection(dbCollNames[collNameKey]).catch((err) => console.error(dbErrMsg.collCreation, err));
+        //     });
+        // }, (err) => console.error(dbErrMsg.collList, err));
         return dataAccess;
     }
     else return connection;
