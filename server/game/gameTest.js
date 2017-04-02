@@ -1,46 +1,29 @@
 /**
  * Created by ajrmatt on 3/16/17.
  */
-import Player from './Player'
 import Game from './Game'
+import GameState from './GameState'
 import ConsoleGame from './ConsoleGame'
 // import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
-// import Util from 'util'
+import Util from 'util'
 
-
-let playerBottom = new Player({
-    username: 'Player 1',
-    // password: '1234',
-    // rating: 0,
-    // wins: 0,
-    // losses: 0,
-    // draws: 0,
-    // friends: [],
-    // _id: '10101100',
-    isBottomPlayer: true,
-});
-let playerTop = new Player({
-    username: 'Player 2',
-    // password: '4321',
-    // rating: 0,
-    // wins: 0,
-    // losses: 0,
-    // draws: 0,
-    // friends: [],
-    // _id: '10100101',
-    isBottomPlayer: false,
-});
 let game = new Game({
-    players: {
-        playerBottom: playerBottom,
-        playerTop: playerTop,
-    },
-    firstPlayer: playerBottom,
+    userIDs: [
+        'generic10002918',
+        'generic10002919',
+    ],
+    pieceIDs: null,
+    db: null,
 });
 
 const consoleGame = new ConsoleGame(game);
 
 consoleGame.start();
+
+// let gameState = game.getGameState();
+//
+// console.log(Util.inspect(gameState, { depth: 5 }));
+// console.log(JSON.stringify(gameState));
 
 // console.log(game.gameboard);
 // game.gameboard[5][2] = new Pawn({

@@ -7,10 +7,10 @@ import { DirectionSet, dirSets } from './DirectionSet'
 import Step from './Step'
 import StepMap from './StepMap'
 
-
 export default class Piece {
     constructor(props) {
         this.name = props.name;
+        this.consoleName = props.consoleName;
         // this.userID = props.userID;
         // this._id = props._id;
         this.player = props.player;

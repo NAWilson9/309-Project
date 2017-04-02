@@ -30,7 +30,6 @@ app.use(express.static(path.join(__dirname, '/../', 'client'), {extensions: ['ht
 
 //Database (will be initialized in callback of dbConnect.connect below)
 let db;
-// let Game;
 //Connect to database
 dbConnect.connect(app, db_config.host, [
     //Place database dependent express middleware (as uncalled functions) in here
@@ -40,8 +39,7 @@ dbConnect.connect(app, db_config.host, [
     // gameboardConnector,
 
 ], (database) => {
-    db = database;
-    // Game = require('./game/game')(database);
+    db = require('./db/dbConnector')(database);
 });
 
 //Starts the servers

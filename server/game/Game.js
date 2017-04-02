@@ -1,19 +1,49 @@
 /**
  * Created by ajrmatt on 3/16/17.
  */
-// let db;
+import Player from './Player'
 import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
 import GameState from './GameState'
 
 export default class Game {
     constructor(props) {
-        this.players = props.players;
+        this.db = props.db;
+        let players = [];
+        for (let idIndex = 0; idIndex < props.userIDs.length; idIndex++) {
+            let userID = props.userIDs[idIndex];
+            if (userID.startsWith('generic')) {
+                players.push(new Player({
+                    userData: {
+                        username: (idIndex === 0 ? 'Top' : 'Bottom') + ' player',
+                        _id: userID,
+                    },
+                    isBottomPlayer: idIndex !== 0,
+                }));
+            } else {
+                this.db.getUserByID(userID, (err, user) => {
+                    if (err) {
+                        console.error('Error getting player data for ' + userID + ':', err);
+                    } else {
+                        delete user.password;
+                        players.push(new Player({
+                            userData: user,
+                            isBottomPlayer: idIndex !== 0,
+                        }));
+                    }
+                });
+            }
+        }
+        this.players = {
+            playerTop: players[0],
+            playerBottom: players[1],
+        };
         this.players.playerTop.opponent = this.players.playerBottom;
         this.players.playerBottom.opponent = this.players.playerTop;
-        this.activePlayer = props.firstPlayer;
+        this.activePlayer = this.players.playerTop;
         this.nextPlayer = handleNextPlayer;
-        this.gameboard = props.pieceList ? null : generateClassicBoard(this);
+        this.gameboard = props.pieceIDs ? null : generateClassicBoard(this);
         this.movePiece = handleMovePiece;
+        this.moveCount = 0;
         this.getGameState = handleGetGameState;
         this.latestMovement = {
             request: null,
@@ -36,6 +66,7 @@ const handleNextPlayer = function() {
 
 const handleMovePiece = function(movement) {
     this.latestMovement.request = movement;
+    this.latestMovement.successful = false;
     const from = movement.start;
     const to = movement.end;
     if (from.x >= 0 && from.x < this.gameboard[0].length && from.y >= 0 && from.y < this.gameboard.length &&
@@ -70,12 +101,14 @@ const handleMovePiece = function(movement) {
                 }
                 this.gameboard[to.y][to.x] = piece;
                 this.gameboard[from.y][from.x] = null;
+                this.moveCount++;
                 piece.currentLocation.x = to.x;
                 piece.currentLocation.y = to.y;
                 piece.moveCount++;
+                this.latestMovement.successful = true;
                 // console.log('Piece:', piece);
                 // console.log('DestPiece:', destinationPiece);
-                updateCheckAndCheckmate(this);
+                updateCheckAndCheckmate(this.players);
                 // console.log('Check:', this.activePlayer.isInCheck, this.nextPlayer().isInCheck);
                 // console.log('Checkmate:', this.activePlayer.isInCheckmate, this.nextPlayer().isInCheckmate);
                 this.activePlayer = this.nextPlayer();
@@ -139,10 +172,10 @@ function canMoveRecursive(piece, step, destinations, results) {
     }
 }
 
-function updateCheckAndCheckmate(game) {
-    for (let playerProp in game.players) {
-        if (game.players.hasOwnProperty(playerProp)) {
-            let player = game.players[playerProp];
+function updateCheckAndCheckmate(players) {
+    for (let playerProp in players) {
+        if (players.hasOwnProperty(playerProp)) {
+            let player = players[playerProp];
             if (player.king.currentLocation !== null) {
                 player.isInCheck = inDanger(player.king);
                 player.isInCheckmate = player.isInCheck && !canEscape(player.king);
@@ -261,49 +294,57 @@ function generateClassicBoard(game) {
     let board = [
         [
             new Rook({
-                name: 'r',
+                name: 'rook',
+                consoleName: 'r',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Knight({
-                name: 'n',
+                name: 'knight',
+                consoleName: 'n',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Bishop({
-                name: 'b',
+                name: 'bishop',
+                consoleName: 'b',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Queen({
-                name: 'q',
+                name: 'queen',
+                consoleName: 'q',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new King({
-                name: 'k',
+                name: 'king',
+                consoleName: 'k',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Bishop({
-                name: 'b',
+                name: 'bishop',
+                consoleName: 'b',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Knight({
-                name: 'n',
+                name: 'knight',
+                consoleName: 'n',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
             }),
             new Rook({
-                name: 'r',
+                name: 'rook',
+                consoleName: 'r',
                 // userID: game.players.playerTop._id,
                 // _id: '11001010',
                 player: game.players.playerTop,
@@ -312,49 +353,57 @@ function generateClassicBoard(game) {
         ],
         [
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
             }),
             new Pawn({
-                name: 'p',
+                name: 'pawn',
+                consoleName: 'p',
                 // userID: game.players.playerTop._id,
                 // _id: '10010010',
                 player: game.players.playerTop,
@@ -374,49 +423,57 @@ function generateClassicBoard(game) {
         ],
         [
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
             }),
             new Pawn({
-                name: 'P',
+                name: 'pawn',
+                consoleName: 'P',
                 // userID: game.players.playerBottom._id,
                 // _id: '10010010',
                 player: game.players.playerBottom,
@@ -424,49 +481,57 @@ function generateClassicBoard(game) {
         ],
         [
             new Rook({
-                name: 'R',
+                name: 'rook',
+                consoleName: 'R',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Knight({
-                name: 'N',
+                name: 'knight',
+                consoleName: 'N',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Bishop({
-                name: 'B',
+                name: 'bishop',
+                consoleName: 'B',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Queen({
-                name: 'Q',
+                name: 'queen',
+                consoleName: 'Q',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new King({
-                name: 'K',
+                name: 'king',
+                consoleName: 'K',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Bishop({
-                name: 'B',
+                name: 'bishop',
+                consoleName: 'B',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Knight({
-                name: 'N',
+                name: 'knight',
+                consoleName: 'N',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
             }),
             new Rook({
-                name: 'R',
+                name: 'rook',
+                consoleName: 'R',
                 // userID: game.players.playerBottom._id,
                 // _id: '11001010',
                 player: game.players.playerBottom,
