@@ -1,13 +1,15 @@
 /**
  * Created by ajrmatt on 3/15/17.
  */
-import { Movement, DependentMovement } from './Movement'
-import MovementList from './MovementList'
-import { DirectionSet, dirSets } from './DirectionSet'
-import Step from './Step'
-import StepMap from './StepMap'
+const Movement = require('./Movement').Movement;
+const DependentMovement = require('./Movement').DependentMovement;
+const  MovementList = require('./MovementList').MovementList;
+const DirectionSet = require('./DirectionSet').DirectionSet;
+const dirSets = require('./DirectionSet').dirSets;
+const Step = require('./Step').Step;
+const StepMap = require('./StepMap').StepMap;
 
-export default class Piece {
+module.exports.Piece = class Piece {
     constructor(props) {
         this.name = props.name;
         this.consoleName = props.consoleName;
@@ -24,7 +26,7 @@ export default class Piece {
         this.currentLocation = null;
         this.generateRelativeStepMap = handleGenerateRelativeStepMap;
     }
-}
+};
 /**
  * MovementList choice dependent on attacking and numMoves
  *
@@ -164,7 +166,7 @@ function containsLocation(destinations, location) {
     return false;
 }
 
-export class Knight extends Piece {
+module.exports.Knight = class Knight extends module.exports.Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
@@ -192,9 +194,9 @@ export class Knight extends Piece {
         props.canJump = true;
         super(props);
     }
-}
+};
 
-export class Rook extends Piece {
+module.exports.Rook = class Rook extends module.exports.Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
@@ -215,9 +217,9 @@ export class Rook extends Piece {
         props.canJump = false;
         super(props);
     }
-}
+};
 
-export class Queen extends Piece {
+module.exports.Queen = class Queen extends module.exports.Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
@@ -238,9 +240,9 @@ export class Queen extends Piece {
         props.canJump = false;
         super(props);
     }
-}
+};
 
-export class King extends Piece {
+module.exports.King = class King extends module.exports.Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
@@ -256,9 +258,9 @@ export class King extends Piece {
         props.canJump = false;
         super(props);
     }
-}
+};
 
-export class Bishop extends Piece {
+module.exports.Bishop = class Bishop extends module.exports.Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
@@ -279,9 +281,9 @@ export class Bishop extends Piece {
         props.canJump = false;
         super(props);
     }
-}
+};
 
-export class Pawn extends Piece {
+module.exports.Pawn = class Pawn extends module.exports.Piece {
     constructor(props) {
         props.defaultMovementLists = [
             new MovementList([
@@ -311,4 +313,4 @@ export class Pawn extends Piece {
         props.canJump = false;
         super(props);
     }
-}
+};

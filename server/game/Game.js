@@ -1,11 +1,16 @@
 /**
  * Created by ajrmatt on 3/16/17.
  */
-import Player from './Player'
-import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
-import GameState from './GameState'
+const Player = require('./Player').Player;
+const Knight = require('./Piece').Knight;
+const Rook = require('./Piece').Rook;
+const Queen = require('./Piece').Queen;
+const King = require('./Piece').King;
+const Bishop = require('./Piece').Bishop;
+const Pawn = require('./Piece').Pawn;
+const GameState = require('./GameState').GameState;
 
-export default class Game {
+module.exports.Game = class Game {
     constructor(props) {
         this.db = props.db;
         let players = [];
@@ -51,7 +56,7 @@ export default class Game {
             errMsg: null,
         };
     }
-}
+};
 
 const handleGetGameState = function() {
     return new GameState(this);

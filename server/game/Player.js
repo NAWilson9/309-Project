@@ -2,7 +2,7 @@
  * Created by ajrmatt on 3/17/17.
  */
 
-export default class Player {
+module.exports.Player = class Player {
     constructor(props) {
         this.userData = props.userData;
         this.isBottomPlayer = props.isBottomPlayer;
@@ -12,4 +12,4 @@ export default class Player {
         this.isInCheck = false;
         this.isInCheckmate = false;
     }
-}
+};

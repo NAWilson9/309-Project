@@ -292,7 +292,7 @@ export default function reducer(state={
         case 'pieceMoveComplete': {
             // console.log('complete: ' + action.payload);
             console.log({start: action.payload, end: state.moveDestination});
-            socket.emit('/movePiece', {start: action.payload, end: state.moveDestination});
+            // socket.emit('/movePiece', {start: action.payload, end: state.moveDestination});
 
             let destinationPosition = state.moveDestination;//.split(',');
             // let destinationPiece = Object.assign({}, state.board[destinationPosition[0]][destinationPosition[1]]);
@@ -309,6 +309,10 @@ export default function reducer(state={
             console.log( board[destinationPosition.y][destinationPosition.x]);
 
             return {...state, board: board}
+        }
+        case 'updateGameState': {
+            const gameState = action.payload;
+            return {...state, board: gameState.board }
         }
         default: {
             return state

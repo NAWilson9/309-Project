@@ -19,7 +19,7 @@ const getStyle = function(over){
 @connect((store) => {
     return {
         board: store.game.board,
-        over: store.game.over
+        over: store.game.over,
     };
 })
 export default class Board extends React.Component{

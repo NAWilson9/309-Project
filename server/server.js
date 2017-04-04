@@ -6,6 +6,7 @@ const express = require('express');
 const dbConnect = require('./db/dbConnector.js')();
 const io = require('socket.io')();
 const path = require('path');
+const Game = require('./game/Game').Game;
 
 //Connectors
 const userConnector = require('./connectors/user/userConnector');
@@ -82,6 +83,15 @@ io.on('connection', function (socket) {
             socket.join(roomName);
             usersSearching.shift().join(roomName);
             //Todo: Create new game instance
+            games.push(new Game({
+                db: db,
+                userIDs: [
+                    'generic1234',
+                    'generic5678',
+                ],
+            }));
+            io.in(roomName).emit('updateGameState', games[0].getGameState());
+            console.log(games);
             io.in(roomName).emit('gameFound', null);
             console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
         } else {
@@ -110,8 +120,12 @@ io.on('connection', function (socket) {
         }
     });
 
-    socket.on('movePiece', function (data) {
+    socket.on('requestMovePiece', function (movement) {
        //Todo: handle game update
+        console.log('Movement requested:', movement);
+        let game = games[0];
+        game.movePiece(movement);
+        io.in(getGameRoom(socket)).emit('updateGameState', game.getGameState());
     });
 
     socket.on('chat', function(message){

@@ -12,7 +12,7 @@ export default class BoardRow extends React.Component{
         return (
             <div style={getStyles(this.props)}>{
                 this.props.rowData.map(function(square, i){
-                    return <BoardSquare key={i} rowNumber={this.props.rowNumber} cellNumber={i} data={square} rowCount={this.props.rowData.length} even={(this.props.even) ? (i%2 == 0) : ((i+1)%2 == 0)}/>
+                    return <BoardSquare key={i} rowNumber={this.props.rowNumber} cellNumber={i} piece={square} rowCount={this.props.rowData.length} even={(this.props.even) ? (i%2 == 0) : ((i+1)%2 == 0)}/>
                 }, this)
             }</div>
         );

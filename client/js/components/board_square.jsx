@@ -3,10 +3,13 @@ import { connect } from "react-redux"
 import React from 'react';
 import Piece from './piece.jsx';
 
+import { requestMovePiece } from '../socket'
+
 const getStyle = function(props){
     return {
         // borderStyle: 'solid',
         // borderWidth: '1px',
+        // todo: Should be column count? - Adam
         width: (100/props.rowCount) + '%',
         // paddingTop: (100/props.rowCount) - 2 + '%',
         height: (100/props.rowCount) + '%',
@@ -17,7 +20,9 @@ const getStyle = function(props){
 };
 
 @connect((store) => {
-    return {};
+    return {
+        moveDestination: store.game.moveDestination,
+    };
 })
 export default class BoardSquare extends React.Component{
     dragEnterHandler(ev){
@@ -32,19 +37,20 @@ export default class BoardSquare extends React.Component{
     }
 
     onDragEnd(ev){
-        this.props.dispatch({
-            type: 'pieceMoveComplete',
-            payload: {
+        requestMovePiece({
+            start: {
                 x: this.props.cellNumber,
                 y: this.props.rowNumber,
             },
-            // payload: this.props.rowNumber + ',' + this.props.cellNumber
-        })
+            end: this.props.moveDestination,
+        });
+        // payload: this.props.rowNumber + ',' + this.props.cellNumber
     }
 
     render(){
-        let image = (this.props.data.image != null)
-            ? <Piece image={this.props.data.image} row={this.props.rowNumber} cell={this.props.cellNumber}/>
+        console.log('board_square props:', this.props);
+        let image = (this.props.piece !== null)
+            ? <Piece image={this.props.piece.name + '.svg'} row={this.props.rowNumber} cell={this.props.cellNumber}/>
             : <div style={{paddingTop:'100%'}}/>;
 
         return (

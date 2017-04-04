@@ -1,11 +1,11 @@
 /**
  * Created by ajrmatt on 3/16/17.
  */
-import Game from './Game'
-import GameState from './GameState'
-import ConsoleGame from './ConsoleGame'
+const Game = require('./Game').Game;
+const GameState = require('./GameState').GameState;
+const ConsoleGame = require('./ConsoleGame').ConsoleGame;
 // import { Knight, Rook, Queen, King, Bishop, Pawn } from './Piece'
-import Util from 'util'
+const Util = require('util');
 
 let game = new Game({
     userIDs: [

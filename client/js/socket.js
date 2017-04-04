@@ -13,7 +13,7 @@ export function findGame(){
         if(!result){
             store.dispatch({
                 type: 'findGame',
-                payload: null
+                payload: null,
             });
         }
     });
@@ -23,12 +23,16 @@ export function cancelGameSearch(){
     socket.emit('cancelGameSearch');
     store.dispatch({
         type: 'cancelGameSearch',
-        payload: null
+        payload: null,
     });
 }
 
 export function sendChatMessage(message){
     socket.emit('sendChatMessage', message);
+}
+
+export function requestMovePiece(movement) {
+    socket.emit('requestMovePiece', movement);
 }
 
 // Listeners
@@ -39,13 +43,20 @@ socket.on('debug', function(data){
 socket.on('gameFound', function(){
     store.dispatch({
         type: 'gameFound',
-        payload: null
-    })
+        payload: null,
+    });
 });
 
 socket.on('chatMessage', function(data){
    store.dispatch({
        type: 'newChatMessage',
-       payload: data
-   })
+       payload: data,
+   });
+});
+
+socket.on('updateGameState', function(gameState) {
+    store.dispatch({
+        type: 'updateGameState',
+        payload: gameState,
+    });
 });
