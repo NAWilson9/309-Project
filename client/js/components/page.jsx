@@ -5,7 +5,7 @@ import { Grid } from 'semantic-ui-react'
 import FindGameView from './find_game_view.jsx';
 import GameView from './game_view.jsx';
 import CHSSHeader from './header.jsx';
-import Login from './login.jsx';
+import LoginView from './login_view.jsx';
 import ProfileView from './profile_view.jsx';
 import HomeView from './home_view.jsx';
 
@@ -28,7 +28,7 @@ export default class Page extends React.Component{
                 return <h1>You have been logged out!</h1>;
             case 'profile':
                 if (this.props.loggedIn) return <ProfileView/>;
-                else return <Login/>;
+                else return <LoginView/>;
             default:
                 return <h1 style={{textAlign: 'center'}}>{this.props.view} page in progress...</h1>;
         }

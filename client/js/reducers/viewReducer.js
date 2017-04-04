@@ -2,7 +2,6 @@ export default function reducer(state={
     current: 'home',
     inQueue: false,
     inGame: false,
-    loggedIn: false
 }, action) {
 
     switch (action.type) {

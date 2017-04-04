@@ -1,19 +1,8 @@
-import store from "./store"
+import store from './store'
 
 const socket = io.connect(window.location.origin);
 
 // Request handlers
-export function findGame(){
-    socket.emit('findGame', function(){
-        //This callback is used to prevent the loading components from
-        // flickering on the screen before the game board loads.
-        store.dispatch({
-            type: 'findGame',
-            payload: null,
-        });
-    });
-}
-
 export function cancelGameSearch(){
     socket.emit('cancelGameSearch');
     store.dispatch({
@@ -22,12 +11,23 @@ export function cancelGameSearch(){
     });
 }
 
-export function sendChatMessage(message){
-    socket.emit('sendChatMessage', message);
+export function findGame(){
+    socket.emit('findGame', function(){
+        // This callback is used to prevent the loading elements from
+        // flickering on the screen before the game board loads.
+        store.dispatch({
+            type: 'findGame',
+            payload: null,
+        });
+    });
 }
 
-export function movePiece(movement) {
-    socket.emit('movePiece', movement);
+export function movePiece(move) {
+    socket.emit('movePiece', move);
+}
+
+export function sendMessage(message){
+    socket.emit('sendMessage', message);
 }
 
 // Listeners
@@ -46,16 +46,16 @@ socket.on('gameFound', function(gameState){
     })
 });
 
-socket.on('chatMessage', function(data){
-   store.dispatch({
-       type: 'newChatMessage',
-       payload: data
-   });
-});
-
 socket.on('updateGameState', function(gameState) {
     store.dispatch({
         type: 'updateGameState',
         payload: gameState
+    });
+});
+
+socket.on('chatMessage', function(message){
+    store.dispatch({
+        type: 'chatMessage',
+        payload: message
     });
 });

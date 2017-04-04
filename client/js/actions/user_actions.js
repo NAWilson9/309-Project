@@ -1,4 +1,6 @@
-import store from "../store"
+import 'browser-request';
+
+import store from '../store'
 
 export function logout(){
     setTimeout(function(){
@@ -11,4 +13,9 @@ export function logout(){
             payload: 'home',
         });
     }, 3000);
+}
+
+export function login(){
+    console.log('testttt');
+    request({method:'POST', url:'/api/user/login', body:'{"relaxed":true}', json: true}, function(){console.log('test')});
 }

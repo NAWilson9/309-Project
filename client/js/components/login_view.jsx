@@ -1,7 +1,9 @@
 import React from 'react';
-import { Button, Form } from 'semantic-ui-react'
+import { Button, Form } from 'semantic-ui-react';
 
-export default class Login extends React.Component{
+import login from '../actions/user_actions.js';
+
+export default class LoginView extends React.Component{
     render() {
         return (
             <div>
@@ -15,7 +17,7 @@ export default class Login extends React.Component{
                         <label style={{textAlign: 'left'}}>Password</label>
                         <input type='password' placeholder='Password' />
                     </Form.Field>
-                    <Button type='submit' color='green' size='massive'>Submit</Button>
+                    <Button color='green' onClick={login} size='massive'>Submit</Button>
                 </Form>
             </div>
         );

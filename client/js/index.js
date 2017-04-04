@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from "react-redux";
+import { Provider } from 'react-redux';
 
 import './socket.js';
 import Page from './components/page.jsx';
-import store from "./store"
+import store from './store'
 
 ReactDOM.render(
     <Provider store={store}>

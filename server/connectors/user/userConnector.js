@@ -13,13 +13,13 @@ let userDataHandler = function(user){
     return updatedUser;
 };
 
-// Handles GET requests to '/api/user/login.jsx'
+// Handles GET requests to '/api/user/login'
 // Expects query parameters of:
 // - username: string
 // - password: string
 // Responds with user profile object upon successful authentication.
 // Responds with 'Unapproved credentials.' otherwise.
-router.post(config.base_url + 'login.jsx', function (req, res) {
+router.post(config.base_url + 'login', function (req, res) {
     let username = req.body.username;
     let password = req.body.password;
     if(!username || !password){

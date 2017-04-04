@@ -1,12 +1,12 @@
 export default function reducer(state={
-    username: 'ur trash',
+    username: null, //Todo: define data and defaults
 }, action) {
 
     switch (action.type) {
-        case 'login.jsx': {
-            return {...state, username: action.payload}
+        case 'login': {
+            return {...state, username: action.payload} //Todo: set data
         } case 'logout': {
-            return {...state, username: null}
+            return {...state, username: null} //Todo: clear data
         } default: {
             return state
         }
