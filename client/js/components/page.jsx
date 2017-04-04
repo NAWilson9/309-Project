@@ -1,35 +1,50 @@
 import React from 'react';
-import { connect } from "react-redux"
+import { connect } from 'react-redux'
+import { Grid } from 'semantic-ui-react'
 
 import FindGameView from './find_game_view.jsx';
 import GameView from './game_view.jsx';
 import CHSSHeader from './header.jsx';
+import Login from './login.jsx';
+import ProfileView from './profile_view.jsx';
+import HomeView from './home_view.jsx';
 
 @connect((store) => {
     return {
         inGame: store.view.inGame,
+        loggedIn: store.view.loggedIn,
         view: store.view.current
     };
 })
 export default class Page extends React.Component{
-
     getPageComponent(){
-        if(this.props.view === 'game'){
-            if(this.props.inGame){
-                return <GameView/>;
-            } else {
-                return <FindGameView/>;
-            }
-        } else {
-            return <h1 style={{textAlign: 'center'}}>{this.props.view} page in progress...</h1>;
+        switch(this.props.view){
+            case 'game':
+                if (this.props.inGame) return <GameView/>;
+                else return <FindGameView/>;
+            case 'home':
+                return <HomeView/>;
+            case 'logout':
+                return <h1>You have been logged out!</h1>;
+            case 'profile':
+                if (this.props.loggedIn) return <ProfileView/>;
+                else return <Login/>;
+            default:
+                return <h1 style={{textAlign: 'center'}}>{this.props.view} page in progress...</h1>;
         }
     };
 
     render() {
         return (
-            <main style={{width: "100%", height: "85%"}}>
+            <main style={{height: '85%', width: '100%'}}>
                 <CHSSHeader/>
-                {this.getPageComponent()}
+                <Grid style={{height: '100%'}} textAlign='center' verticalAlign='middle'>
+                    <Grid.Row>
+                        <Grid.Column>
+                            {this.getPageComponent()}
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
             </main>
         );
     }

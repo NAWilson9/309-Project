@@ -82,7 +82,7 @@ io.on('connection', function (socket) {
             let roomName = gameIDGenerator();
             socket.join(roomName);
             usersSearching.shift().join(roomName);
-            //Todo: Create new game instance
+
             games.push(new Game({
                 db: db,
                 userIDs: [
@@ -90,13 +90,12 @@ io.on('connection', function (socket) {
                     'generic5678',
                 ],
             }));
-            io.in(roomName).emit('updateGameState', games[0].getGameState());
-            console.log(games);
-            io.in(roomName).emit('gameFound', null);
+
+            io.in(roomName).emit('gameFound', games[0].getGameState());
             console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
         } else {
             usersSearching.push(socket);
-            callback(false); //Todo: figure out what this should be
+            callback();
             console.log(new Date().toLocaleTimeString() + ' | A user has been added to the search queue.');
         }
     });
@@ -120,8 +119,7 @@ io.on('connection', function (socket) {
         }
     });
 
-    socket.on('requestMovePiece', function (movement) {
-       //Todo: handle game update
+    socket.on('movePiece', function (movement) {
         console.log('Movement requested:', movement);
         let game = games[0];
         game.movePiece(movement);

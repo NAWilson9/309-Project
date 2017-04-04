@@ -3,7 +3,7 @@ import { connect } from "react-redux"
 import React from 'react';
 import Piece from './piece.jsx';
 
-import { requestMovePiece } from '../socket'
+import { movePiece } from '../socket'
 
 const getStyle = function(props){
     return {
@@ -37,7 +37,7 @@ export default class BoardSquare extends React.Component{
     }
 
     onDragEnd(ev){
-        requestMovePiece({
+        movePiece({
             start: {
                 x: this.props.cellNumber,
                 y: this.props.rowNumber,
@@ -48,7 +48,6 @@ export default class BoardSquare extends React.Component{
     }
 
     render(){
-        console.log('board_square props:', this.props);
         let image = (this.props.piece !== null)
             ? <Piece image={this.props.piece.name + '.svg'} row={this.props.rowNumber} cell={this.props.cellNumber}/>
             : <div style={{paddingTop:'100%'}}/>;
