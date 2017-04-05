@@ -3,16 +3,26 @@ import store from './store'
 const socket = io.connect(window.location.origin);
 
 // Request handlers
-export function cancelGameSearch(){
-    socket.emit('cancelGameSearch');
+export function leaveQueue(){
+    socket.emit('leaveQueue');
     store.dispatch({
-        type: 'cancelGameSearch',
+        type: 'leaveQueue',
         payload: null
     });
 }
 
 export function findGame(){
-    socket.emit('findGame', function(){
+    //Returns a randomly generated 14 character string, starting with 'game'.
+    function keyGen(){
+        let key = 'game';
+        const possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        for(let i = 0; i < 10; i++ ){
+            key += possible[Math.floor(Math.random() * possible.length)];
+        }
+        return key;
+    }
+
+    socket.emit('findGame', keyGen(), function(){
         // This callback is used to prevent the loading elements from
         // flickering on the screen before the game board loads.
         store.dispatch({
@@ -20,6 +30,10 @@ export function findGame(){
             payload: null,
         });
     });
+}
+
+export function leaveGame(){
+    socket.emit('leaveGame');
 }
 
 export function movePiece(move) {
@@ -44,6 +58,14 @@ socket.on('gameFound', function(gameState){
         type: 'updateGameState',
         payload: gameState
     })
+});
+
+socket.on('playerLeft', function(gameState) {
+    console.log('playerleft');
+    store.dispatch({
+        type: 'leaveGame',
+        payload: null,
+    });
 });
 
 socket.on('updateGameState', function(gameState) {

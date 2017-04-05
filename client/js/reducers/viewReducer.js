@@ -8,11 +8,13 @@ export default function reducer(state={
         case 'changeView': {
             return {...state, current: action.payload}
         } case 'findGame': {
-            return {...state, inQueue: true}
-        } case 'cancelGameSearch': {
-            return {...state, inQueue: false}
+           return {...state, inQueue: true}
         } case 'gameFound': {
             return {...state, inGame: true, inQueue: false}
+        } case 'leaveGame': {
+            return {...state, inGame: false}
+        } case 'leaveQueue': {
+            return {...state, inQueue: false}
         } default: {
             return state
         }
