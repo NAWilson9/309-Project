@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Button, Loader } from 'semantic-ui-react'
 
-import { cancelSearch, findGame } from '../socket.js'
+import { findGame, leaveQueue } from '../socket.js'
 
 @connect((store) => {
     return {
@@ -19,7 +19,7 @@ export default class FindGameView extends React.Component{
                 {this.props.inQueue &&
                     <Loader active inline='centered' size='massive' style={{marginBottom: '30px'}}>Searching...</Loader>}
                 {this.props.inQueue &&
-                    <Button color='red' onClick={cancelSearch} size='massive'>Leave Queue</Button>}
+                    <Button color='red' onClick={leaveQueue} size='massive'>Leave Queue</Button>}
             </div>
         );
     }

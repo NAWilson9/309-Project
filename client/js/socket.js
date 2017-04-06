@@ -60,8 +60,7 @@ socket.on('gameFound', function(gameState){
     })
 });
 
-socket.on('playerLeft', function(gameState) {
-    console.log('playerleft');
+socket.on('playerLeft', function() {
     store.dispatch({
         type: 'leaveGame',
         payload: null,

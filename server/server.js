@@ -73,7 +73,7 @@ function getGameInstance(socket){
 
 //Returns the name of the game room the socket is currently in.
 function getGameRoomName(socket){
-    return Object.keys(socket.adapter.rooms).find(function(room){
+    return Object.keys(socket.rooms).find(function(room){
         return room.startsWith('game');
     });
 }
@@ -155,19 +155,21 @@ io.on('connection', function (socket) {
 
     //Forwards chat messages to the entire room.
     socket.on('sendMessage', function(message){
-        // Todo:
-        // This only forwards the chat messages. Validation should be
-        // added to ensure a user does not try to spoof their username, etc.
+        //Todo:
+        //This only forwards the chat messages. Validation should be
+        //added to ensure a user does not try to spoof their username, etc.
         io.in(getGameRoomName(socket)).emit('chatMessage', message);
     });
 
     //Removes a user from search queue and a game if they're in either.
-    socket.on('disconnect', function(){
+    socket.on('disconnecting', function(){
         try {
             leaveQueue(socket);
-            leaveGame(socket)
+            leaveGame(socket);
         } catch (e){}
+    });
 
+    socket.on('disconnect', function(){
         console.log(new Date().toLocaleTimeString() + ' | A user has disconnected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
     });
 });

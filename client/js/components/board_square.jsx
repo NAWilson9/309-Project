@@ -55,7 +55,6 @@ export default class BoardSquare extends React.Component{
         return (
             <div
                 style={getStyle(this.props)}
-                onClick={()=>this.click()}
                 draggable="true"
                 onDragEnter={(event) => this.dragEnterHandler(event)}
                 onDragEnd={(event) => this.onDragEnd(event)}
