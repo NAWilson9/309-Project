@@ -1,6 +1,13 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
-var header = require('./header.jsx');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 
-ReactDOM.render(React.createElement(header.chssHeader), document.getElementById('react-app'));
+import './socket.js';
+import Page from './components/page.jsx';
+import store from './store'
 
+ReactDOM.render(
+    <Provider store={store}>
+        <Page/>
+    </Provider>, document.getElementById('CHSS')
+);

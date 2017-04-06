@@ -8,7 +8,7 @@
  * |8|P|4|
  * |7|6|5|
  */
-export const dirSets = {
+module.exports.dirSets = dirSets = {
     all: [1,2,3,4,5,6,7,8],
     orthogonal: [0,2,0,4,0,6,0,8],
     diagonal: [1,0,3,0,5,0,7,0],
@@ -17,7 +17,7 @@ export const dirSets = {
     straight: [0,2,0,0,0,0,0,0],
 };
 
-export class DirectionSet {
+module.exports.DirectionSet = class DirectionSet {
     constructor(set) {
         this.dirSet = set.slice();
         // for (let dirIndex in set) {
@@ -35,10 +35,10 @@ export class DirectionSet {
         return newDirectionSet;
     }
     // TODO: Write dynamic direction generation method (for inter-movement dependencies)
-}
+};
 
-export class DependentDirectionSet {
-    constructor(previousDirection) {
-
-    }
-}
+// export class DependentDirectionSet {
+//     constructor(previousDirection) {
+//
+//     }
+// }

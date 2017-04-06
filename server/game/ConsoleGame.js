@@ -1,14 +1,14 @@
 /**
  * Created by ajrmatt on 3/26/17.
  */
-import Readline from 'readline'
+const Readline = require('readline');
 
 const rl = Readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
-export default class ConsoleGame {
+module.exports.ConsoleGame = class ConsoleGame {
     constructor(game) {
         this.game = game;
         this.start = handleStart;

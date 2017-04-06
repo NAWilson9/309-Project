@@ -1,7 +1,7 @@
 /**
  * Created by ajrmatt on 3/23/17.
  */
-export default class GameState {
+module.exports.GameState = class GameState {
     constructor(game) {
         this.players = generateGameStatePlayers(game.players);
         this.activePlayer = game.players.playerTop === game.activePlayer ? this.players.playerTop : this.players.playerBottom;

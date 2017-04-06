@@ -1,7 +1,7 @@
 /**
  * Created by ajrmatt on 3/21/17.
  */
-export default class MovementList {
+module.exports.MovementList = class MovementList {
     constructor(movements) {
         this.first = movements[0];
         if (movements.length > 1) {
