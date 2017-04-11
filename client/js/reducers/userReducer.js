@@ -4,7 +4,7 @@ export default function reducer(state={
 
     switch (action.type) {
         case 'login': {
-            return {...state, username: action.payload} //Todo: set data
+            return {...state, username: action.payload.username} //Todo: set data
         } case 'logout': {
             return {...state, username: null} //Todo: clear data
         } default: {

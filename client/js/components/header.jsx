@@ -16,6 +16,27 @@ export default class CHSSHeader extends React.Component {
         });
     };
 
+    logout(){
+        this.changePage('logout');
+        this.props.dispatch({
+            type: 'logout',
+            payload: null
+        });
+
+        this.changePage = this.changePage.bind(this);
+
+        (function(page, changePage){
+            console.log('page: ' + page);
+            setTimeout(function(){
+                if(page === 'profile') {
+                    changePage('home');
+                }
+            }, 3000);
+        })(this.props.currentPage, this.changePage);
+
+
+    }
+
     render(){
         return (
             <Menu size='huge'>
@@ -60,7 +81,7 @@ export default class CHSSHeader extends React.Component {
                             active={this.props.currentPage === 'logout'}
                             color='red'
                             icon='sign out'
-                            onClick={() => this.changePage('logout')}
+                            onClick={() => this.logout()}
                         />
                     }
                 </Menu.Menu>
