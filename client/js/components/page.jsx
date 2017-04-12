@@ -12,7 +12,7 @@ import HomeView from './home_view.jsx';
 @connect((store) => {
     return {
         inGame: store.view.inGame,
-        loggedIn: store.view.loggedIn,
+        loggedIn: store.user.username,
         view: store.view.current
     };
 })

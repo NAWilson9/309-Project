@@ -14,7 +14,7 @@ export function leaveQueue(){
 export function findGame(){
     //Returns a randomly generated 14 character string, starting with 'game'.
     function keyGen(){
-        let key = 'game';
+        let key = 'generic';
         const possible = 'abcdefghijklmnopqrstuvwxyz0123456789';
         for(let i = 0; i < 10; i++ ){
             key += possible[Math.floor(Math.random() * possible.length)];
@@ -22,7 +22,8 @@ export function findGame(){
         return key;
     }
 
-    socket.emit('findGame', keyGen(), function(){
+    let guid = store.getState().user.username || keyGen();
+    socket.emit('findGame', guid, function(){
         // This callback is used to prevent the loading elements from
         // flickering on the screen before the game board loads.
         store.dispatch({

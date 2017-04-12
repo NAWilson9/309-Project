@@ -14,7 +14,9 @@ export default function reducer(state={
         } case 'leaveGame': {
             return {...state, inGame: false}
         } case 'leaveQueue': {
-            return {...state, inQueue: false}
+           return {...state, inQueue: false}
+        } case 'logout': {
+            return {...state, current: 'logout'}
         } default: {
             return state
         }

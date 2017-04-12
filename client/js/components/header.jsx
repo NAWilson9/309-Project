@@ -2,6 +2,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Menu } from 'semantic-ui-react'
 
+import { logout } from '../actions/user_actions.js';
+
 @connect((store) => {
     return {
         currentPage: store.view.current,
@@ -60,7 +62,7 @@ export default class CHSSHeader extends React.Component {
                             active={this.props.currentPage === 'logout'}
                             color='red'
                             icon='sign out'
-                            onClick={() => this.changePage('logout')}
+                            onClick={() => logout()}
                         />
                     }
                 </Menu.Menu>
