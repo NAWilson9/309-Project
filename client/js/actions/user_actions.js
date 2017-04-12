@@ -3,20 +3,22 @@ import request from 'browser-request';
 import store from '../store'
 
 export function logout(){
+    store.dispatch({
+        type: 'logout',
+        payload: null
+    });
+
     setTimeout(function(){
-        store.dispatch({
-            type: 'logout',
-            payload: null,
-        });
-        store.dispatch({
-            type: 'changeView',
-            payload: 'home',
-        });
+        if(store.getState().view.current === 'logout'){
+            store.dispatch({
+                type: 'changeView',
+                payload: 'home',
+            });
+        }
     }, 3000);
 }
 
-export function login(username, password){
-    console.log('testttt');
+export function login(username, password, callback){
     let credentials = {
         'username': username,
         'password': password
@@ -28,13 +30,8 @@ export function login(username, password){
                 type: 'login',
                 payload: body,
             });
-            console.log('login worked.');
         } else if(response.statusCode === 401){
-            console.error('hacker');
-        } else if(response.statusCode === 400){
-            console.error('trash request. try again kiddo.');
-        } else {
-            //todo: do something
+            callback();
         }
     });
 }

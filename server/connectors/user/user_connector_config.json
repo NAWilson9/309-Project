@@ -2,13 +2,16 @@
     "base_url": "/api/user/",
     "users": [
         {
-            "username": "nick",
-            "password": "hype",
-            "test": "test"
+            "username": "Nick",
+            "password": "hype"
         },
         {
-            "username": "lyle",
-            "password": "123"
+            "username": "Lyle",
+            "password": "12345"
+        },
+        {
+            "username": "debug",
+            "password": "test"
         }
     ]
 }

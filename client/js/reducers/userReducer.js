@@ -1,12 +1,12 @@
 export default function reducer(state={
-    username: null, //Todo: define data and defaults
+    username: null,
 }, action) {
 
     switch (action.type) {
         case 'login': {
-            return {...state, username: action.payload.username} //Todo: set data
+            return {...state, username: action.payload.username}
         } case 'logout': {
-            return {...state, username: null} //Todo: clear data
+            return {...state, username: null}
         } default: {
             return state
         }
