@@ -103,4 +103,36 @@ router.post(config.base_url + 'profile', function(req, res) {
     }
 });
 
+router.post(config.base_url + 'register', function(req, res) {
+    let username = req.body.username;
+    let password = req.body.password;
+    if(!username || !password){
+        res.statusCode = 400;
+        res.send('Username or password not specified. Verify POST data.');
+        return;
+    }
+
+    let user = config.users.find((user) => user.username === username);
+    if(!user){
+        let oldConfig = JSON.parse(JSON.stringify(config));
+        config.users.push(req.body);
+        fs.writeFile(path.join(__dirname, '/user_connector_config.json'), JSON.stringify(config, null, 4), function(err){
+            if(err) {
+                res.statusCode = 500;
+                res.send('Error saving new user data.');
+                config = oldConfig;
+                console.error(new Date().toLocaleTimeString() + ' | Unable to save new user data.');
+                console.error(err);
+            } else {
+                res.send(req.body);
+                console.log(new Date().toLocaleTimeString() + ' | User | User "' + username + '" successfully created.');
+            }
+        });
+    } else {
+        res.statusCode = 400;
+        res.send('Username already in use.');
+        console.warn(new Date().toLocaleTimeString() + ' | User | "' + username + '" is already in use.');
+    }
+});
+
 module.exports = router;
