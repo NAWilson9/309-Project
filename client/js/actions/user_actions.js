@@ -53,3 +53,14 @@ export function register(username, password, callback){
         }
     });
 }
+
+export function changePassword(username, password, callback){
+    let credentials = {
+        'username': username,
+        'password': password
+    };
+
+    request({method:'POST', url:'/api/user/profile?username=' + username, body:credentials, json: true}, function(err, response){
+        callback(response.statusCode === 200);
+    });
+}

@@ -75,7 +75,7 @@ export default class LoginView extends React.Component{
                         <label style={{textAlign: 'left'}}>Password</label>
                         <input type='password' placeholder='Password'  value={this.state.password} onChange={this.formEventHandler}/>
                     </Form.Field>
-                    <Button color="green" disabled={!(this.state.username.length > 0 && this.state.password.length > 3)} onClick={this.login} type='submit' size='massive'>Submit</Button>
+                    <Button color="green" disabled={!(this.state.username.length > 0 && this.state.password.length > 3)} onClick={this.login} type='submit' size='massive' style={{marginBottom: '10px'}}>Submit</Button>
                     <Button color="blue" disabled={!(this.state.username.length > 0 && this.state.password.length > 3)} onClick={this.register} size='massive'>Register</Button>
                 </Form>
             </div>
