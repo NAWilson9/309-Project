@@ -12,6 +12,7 @@ const Game = require('./game/Game').Game;
 const userConnector = require('./connectors/user/userConnector');
 const pieceConnector = require('./connectors/piece/pieceConnector');
 const boardConnector = require('./connectors/boardConnector/boardConnector');
+const dbTest = require('./db/dbRequestTest');
 
 //Middleware definitions
 const logging = function logging(req, res, next) {
@@ -38,7 +39,7 @@ dbConnect.connect(app, db_config.host, [
     // userConnector,
     // pieceConnector,
     // gameboardConnector,
-
+    dbTest
 ], (database) => {
     db = require('./db/dbConnector')(database);
 });

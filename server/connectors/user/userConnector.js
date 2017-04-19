@@ -4,6 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const router = require('express').Router();
 
+//Database variable
+let db;
+
 // Prepares a user object to be returned to a user.
 // Deletes the password property from the user object
 // and returns the updated object.
@@ -112,27 +115,32 @@ router.post(config.base_url + 'register', function(req, res) {
         return;
     }
 
-    let user = config.users.find((user) => user.username === username);
-    if(!user){
-        let oldConfig = JSON.parse(JSON.stringify(config));
-        config.users.push(req.body);
-        fs.writeFile(path.join(__dirname, '/user_connector_config.json'), JSON.stringify(config, null, 4), function(err){
-            if(err) {
-                res.statusCode = 500;
-                res.send('Error saving new user data.');
-                config = oldConfig;
-                console.error(new Date().toLocaleTimeString() + ' | Unable to save new user data.');
-                console.error(err);
-            } else {
+    db.checkUsernameExists(username, (err, usernameExists) => {
+        if (err) {
+            res.statusCode = 500;
+            res.send('Error saving new user data.');
+            console.error(new Date().toLocaleTimeString() + ' | Unable to save new user data.');
+            console.error(err);
+        } else {
+            if (!usernameExists) {
+                let user = {
+
+                };
+                db.createUser(user, (err, res) => {
+
+                });
                 res.send(req.body);
                 console.log(new Date().toLocaleTimeString() + ' | User | User "' + username + '" successfully created.');
+            } else {
+                res.statusCode = 400;
+                res.send('Username already in use.');
+                console.warn(new Date().toLocaleTimeString() + ' | User | "' + username + '" is already in use.');
             }
-        });
-    } else {
-        res.statusCode = 400;
-        res.send('Username already in use.');
-        console.warn(new Date().toLocaleTimeString() + ' | User | "' + username + '" is already in use.');
-    }
+        }
+    });
 });
 
-module.exports = router;
+module.exports = (database) => {
+    db = require('../../db/dbConnector')(database);
+    return router;
+};
