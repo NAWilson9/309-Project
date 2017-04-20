@@ -118,19 +118,31 @@ router.post(config.base_url + 'register', function(req, res) {
     db.checkUsernameExists(username, (err, usernameExists) => {
         if (err) {
             res.statusCode = 500;
-            res.send('Error saving new user data.');
-            console.error(new Date().toLocaleTimeString() + ' | Unable to save new user data.');
+            res.send('Error checking for existence of username.');
+            console.error(new Date().toLocaleTimeString() + ' | Unable to check existence of username.');
             console.error(err);
         } else {
             if (!usernameExists) {
-                let user = {
-
+                let newUser = {
+                    username: username,
+                    password: password,
+                    rating: 0,
+                    wins: 0,
+                    losses: 0,
+                    draws: 0,
+                    friends: [],
                 };
-                db.createUser(user, (err, res) => {
-
+                db.createUser(newUser, (err, dbUser) => {
+                    if (err) {
+                        res.statusCode = 500;
+                        res.send('Error saving new user data.');
+                        console.error(new Date().toLocaleTimeString() + ' | Unable to save new user data.');
+                        console.error(err);
+                    } else {
+                        res.send(dbUser);
+                        console.log(new Date().toLocaleTimeString() + ' | User | User "' + username + '" successfully created.');
+                    }
                 });
-                res.send(req.body);
-                console.log(new Date().toLocaleTimeString() + ' | User | User "' + username + '" successfully created.');
             } else {
                 res.statusCode = 400;
                 res.send('Username already in use.');
