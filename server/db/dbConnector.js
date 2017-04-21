@@ -167,6 +167,24 @@ const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
             );
     } else dbRespond(callback, dbErrMsg.noQueryData);
 };
+const checkItemExistsByKeyValue = (keyValuePair, collectionName, callback) => {
+    if (keyValuePair.value) {
+        delete keyValuePair.value;
+        if (keyValuePair.hasOwnProperty(IDKey)) {
+            if (ObjectID.isValid(keyValuePair[IDKey])) keyValuePair[IDKey] = ObjectID(keyValuePair[IDKey]);
+            else {
+                dbRespond(callback, dbErrMsg.improperIDFormat);
+                return;
+            }
+        }
+        let coll = db.collection(collectionName);
+        coll.findOne(keyValuePair)
+            .then(
+                (res) => dbRespond(callback, undefined, res !== null),
+                (err) => dbRespond(callback, err)
+            );
+    } else dbRespond(callback, dbErrMsg.noQueryData);
+};
 /**
  * Helper Function
  * Creates object formatted for input to getItemByKeyValue()
@@ -316,6 +334,9 @@ const dataAccess = {
      */
     getUserByID: (userID, callback) => {
         getItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
+    },
+    checkUsernameExists: (username, callback) => {
+        checkItemExistsByKeyValue(createKeyValuePair(usernameKey, username), dbCollNames.user, callback);
     },
     /**
      * Update (replace) User database entry with given valid User object

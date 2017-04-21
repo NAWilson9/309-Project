@@ -22,7 +22,7 @@ export function findGame(){
         return key;
     }
 
-    let guid = store.getState().user.username || keyGen();
+    let guid = store.getState().user._id || keyGen();
     socket.emit('findGame', guid, function(){
         // This callback is used to prevent the loading elements from
         // flickering on the screen before the game board loads.

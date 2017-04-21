@@ -12,31 +12,16 @@ const GameState = require('./GameState').GameState;
 
 module.exports.Game = class Game {
     constructor(props) {
-        this.db = props.db;
         let players = [];
-        for (let idIndex = 0; idIndex < props.userIDs.length; idIndex++) {
-            let userID = props.userIDs[idIndex];
-            if (userID.startsWith('generic')) {
-                players.push(new Player({
-                    userData: {
-                        username: (idIndex === 0 ? 'Top' : 'Bottom') + ' player',
-                        _id: userID,
-                    },
-                    isBottomPlayer: idIndex !== 0,
-                }));
-            } else {
-                this.db.getUserByID(userID, (err, user) => {
-                    if (err) {
-                        console.error('Error getting player data for ' + userID + ':', err);
-                    } else {
-                        delete user.password;
-                        players.push(new Player({
-                            userData: user,
-                            isBottomPlayer: idIndex !== 0,
-                        }));
-                    }
-                });
+        for (let userIndex = 0; userIndex < props.users.length; userIndex++) {
+            let user = props.users[userIndex];
+            if (user.username.startsWith('generic')) {
+                user.username = (userIndex === 0 ? 'Top' : 'Bottom') + ' player';
             }
+            players.push(new Player({
+                userData: user,
+                isBottomPlayer: userIndex !== 0,
+            }));
         }
         this.players = {
             playerTop: players[0],

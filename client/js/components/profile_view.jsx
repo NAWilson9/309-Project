@@ -29,7 +29,7 @@ export default class ProfileView extends React.Component{
     changePassword(event){
         event.preventDefault();
         let that = this;
-        changePassword(this.props.user.username, this.state.password, function(success){
+        changePassword(this.props.user._id, this.state.password, function(success){
             that.setState({changeError: !success, changeSuccess: success, password: ''}); //Todo: Clear once displayed for 3 seconds
         });
     }
@@ -40,7 +40,7 @@ export default class ProfileView extends React.Component{
                 <h1>Profile</h1>
                 <span id="profile" style={{left: '50%', maxWidth: '30%', minWidth: '200px'}}>
                     <List id="profileList">
-                        <List.Item>Username: <span>Nick</span></List.Item>
+                        <List.Item>Username: <span>{this.props.user.username}</span></List.Item>
                         <List.Item>Rank: <span>{this.props.user.rating}</span></List.Item>
                         <List.Item style={{color: '#21BA45'}}>Wins: <span>{this.props.user.wins}</span></List.Item>
                         <List.Item style={{color: '#FBBD08'}}>Draws: <span>{this.props.user.draws}</span></List.Item>

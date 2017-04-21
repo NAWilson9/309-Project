@@ -12,6 +12,14 @@
         {
             "username": "debug",
             "password": "test"
+        },
+        {
+            "username": "ajrmatt",
+            "password": "what"
+        },
+        {
+            "username": "d",
+            "password": "asjdf"
         }
     ]
 }

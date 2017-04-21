@@ -8,7 +8,7 @@ export default function reducer(state={
 
     switch (action.type) {
         case 'login': {
-            return {...state, username: action.payload.username}
+            return action.payload; /*{...state, username: action.payload.username}*/
         } case 'logout': {
             return {...state, username: null}
         } default: {
