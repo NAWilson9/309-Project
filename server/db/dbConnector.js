@@ -336,7 +336,7 @@ const dataAccess = {
         getItemByKeyValue(createKeyValuePair(IDKey, userID), dbCollNames.user, callback);
     },
     checkUsernameExists: (username, callback) => {
-        checkItemExistsByKeyValue(createKeyValuePair(IDKey, username), dbCollNames.user, callback);
+        checkItemExistsByKeyValue(createKeyValuePair(usernameKey, username), dbCollNames.user, callback);
     },
     /**
      * Update (replace) User database entry with given valid User object

@@ -30,7 +30,7 @@ export function login(username, password, callback){
                 type: 'login',
                 payload: body,
             });
-        } else if(response.statusCode === 401) {
+        } else /*if (response.statusCode === 401)*/ {
             callback();
         }
     });
@@ -48,21 +48,19 @@ export function register(username, password, callback){
                 type: 'login',
                 payload: body,
             });
-            console.log('response:', response);
-            console.log('body:', body);
         } else /*if(response.statusCode === 400)*/ {
             callback();
         }
     });
 }
 
-export function changePassword(username, password, callback){
+export function changePassword(userID, password, callback){
     let credentials = {
-        'username': username,
+        'userID': userID,
         'password': password
     };
 
-    request({method:'POST', url:'/api/user/profile?username=' + username, body:credentials, json: true}, function(err, response){
+    request({method:'POST', url:'/api/user/profile?userID=' + userID, body:credentials, json: true}, function(err, response){
         callback(response.statusCode === 200);
     });
 }

@@ -12,7 +12,6 @@ const Game = require('./game/Game').Game;
 const userConnector = require('./connectors/user/userConnector');
 const pieceConnector = require('./connectors/piece/pieceConnector');
 const boardConnector = require('./connectors/boardConnector/boardConnector');
-const dbTest = require('./db/dbRequestTest');
 
 //Middleware definitions
 const logging = function logging(req, res, next) {
@@ -24,7 +23,6 @@ const logging = function logging(req, res, next) {
 const app = express();
 app.use(bodyParser.json());
 app.use(logging);
-app.use(userConnector);
 app.use(pieceConnector);
 app.use(boardConnector);
 app.use(express.static(path.join(__dirname, '/../', 'node_modules/semantic-ui-css/')));
@@ -39,7 +37,7 @@ dbConnect.connect(app, db_config.host, [
     // userConnector,
     // pieceConnector,
     // gameboardConnector,
-    dbTest
+    userConnector,
 ], (database) => {
     db = require('./db/dbConnector')(database);
 });
@@ -104,28 +102,40 @@ io.on('connection', function (socket) {
     //when a user is placed into the queue.
     socket.on('findGame', function(guid, callback){
         //Store easily identifiable guid on socket object.
-        socket.guid = 'generic' + guid; //Todo
+        socket.guid = guid; //Todo
         if(usersInQueue.length > 0){
             //Create and fetch data.
             let otherSocket = usersInQueue.shift();
             let roomName = createRoomID();
-            let newGame = new Game({
-                db: db,
-                userIDs: [
-                    socket.guid,
-                    otherSocket.guid,
-                ]
+
+            getUserDataForSockets([
+                socket,
+                otherSocket,
+            ], (err, errSocket, users) => {
+                if (err) {
+                    // emit error? todo
+                    if (errSocket) {
+                        console.error(new Date().toLocaleTimeString() + ' | Unable to obtain user data for userID ' + errSocket.guid);
+                    } else {
+                        console.error(new Date().toLocaleTimeString() + ' | Unable to obtain user data.');
+                    }
+                    console.error(err);
+                } else {
+                    let newGame = new Game({
+                        users: users,
+                    });
+                    //Move sockets into room
+                    socket.join(roomName);
+                    otherSocket.join(roomName);
+                    // Push new game state
+                    io.in(roomName).emit('gameFound', newGame.getGameState());
+
+                    //Store new game.
+                    activeGames.push(newGame);
+
+                    console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
+                }
             });
-
-            //Move sockets into room and push new game state.
-            socket.join(roomName);
-            otherSocket.join(roomName);
-            io.in(roomName).emit('gameFound', newGame.getGameState());
-
-            //Store new game.
-            activeGames.push(newGame);
-
-            console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
         } else {
             usersInQueue.push(socket);
             if(callback) callback();
@@ -208,4 +218,42 @@ function leaveQueue(socket){
     });
 
     console.log(new Date().toLocaleTimeString() + ' | A user has been removed from the search queue.');
+}
+
+function getUserDataForSockets(sockets, callback) {
+    let userArr = [];
+    getUserDataForSocketsRecursive(sockets, 0, userArr, callback);
+    return userArr;
+}
+
+function getUserDataForSocketsRecursive(sockets, socketIndex, userArr, callback) {
+    let guid = sockets[socketIndex].guid;
+    if (guid.startsWith('generic')) {
+        userArr.push({
+            username: guid,
+            _id: guid,
+        });
+        if (socketIndex === sockets.length-1) {
+            callback(undefined, null, userArr);
+        } else {
+            getUserDataForSocketsRecursive(sockets, socketIndex + 1, userArr, callback);
+        }
+    } else {
+        db.getUserByID(guid, (err, user) => {
+            if (err) {
+                callback(err, null, undefined);
+            } else {
+                if (user) {
+                    userArr.push(user);
+                    if (socketIndex === sockets.length-1) {
+                        callback(undefined, null, userArr);
+                    } else {
+                        getUserDataForSocketsRecursive(sockets, socketIndex + 1, userArr, callback);
+                    }
+                } else {
+                    callback('UserID ' + guid + ' does not exist.', sockets[socketIndex], null);
+                }
+            }
+        });
+    }
 }
