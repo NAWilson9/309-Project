@@ -1,156 +1,280 @@
 export default function reducer(state={
     //Todo: Get rid of the junk
     players: [],
-    board: [
-        [
-            {
-                number: 1,
-                name: 'rook'
-            },
-            {
-                number: 2,
-                name: 'knight'
-            },
-            {
-                number: 3,
-                name: 'bishop'
-            },
-            {
-                number: 4,
-                name: 'king'
-            },
-            {
-                number: 5,
-                name: 'queen'
-            },
-            {
-                number: 6,
-                name: 'bishop'
-            },
-            {
-                number: 7,
-                name: 'knight'
-            },
-            {
-                number: 8,
-                name: 'rook'
-            },
-        ],
-        [
-            {
-                number: 1,
-                name: 'pawn'
-            },
-            {
-                number: 2,
-                name: 'pawn'
-            },
-            {
-                number: 3,
-                name: 'pawn'
-            },
-            {
-                number: 4,
-                name: 'pawn'
-            },
-            {
-                number: 5,
-                name: 'pawn'
-            },
-            {
-                number: 6,
-                name: 'pawn'
-            },
-            {
-                number: 7,
-                name: 'pawn'
-            },
-            {
-                number: 8,
-                name: 'pawn'
-            },
-        ],
-        [
-            null, null, null, null, null, null, null, null,
-        ],
-        [
-            null, null, null, null, null, null, null, null,
-        ],
-        [
-            null, null, null, null, null, null, null, null,
-        ],
-        [
-            null, null, null, null, null, null, null, null,
-        ],
-        [
-            {
-                number: 1,
-                name: 'pawn'
-            },
-            {
-                number: 2,
-                name: 'pawn'
-            },
-            {
-                number: 3,
-                name: 'pawn'
-            },
-            {
-                number: 4,
-                name: 'pawn'
-            },
-            {
-                number: 5,
-                name: 'pawn'
-            },
-            {
-                number: 6,
-                name: 'pawn'
-            },
-            {
-                number: 7,
-                name: 'pawn'
-            },
-            {
-                number: 8,
-                name: 'pawn'
-            },
-        ],
-        [
-            {
-                number: 1,
-                name: 'rook'
-            },
-            {
-                number: 2,
-                name: 'knight'
-            },
-            {
-                number: 3,
-                name: 'bishop'
-            },
-            {
-                number: 4,
-                name: 'king'
-            },
-            {
-                number: 5,
-                name: 'queen'
-            },
-            {
-                number: 6,
-                name: 'bishop'
-            },
-            {
-                number: 7,
-                name: 'knight'
-            },
-            {
-                number: 8,
-                name: 'rook'
-            },
-        ]
-    ],
+    board: [],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: 'rook.svg'
+    //         },
+    //         {
+    //             number: 2,
+    //             image: 'knight.svg'
+    //         },
+    //         {
+    //             number: 3,
+    //             image: 'bishop.svg'
+    //         },
+    //         {
+    //             number: 4,
+    //             image: 'king.svg'
+    //         },
+    //         {
+    //             number: 5,
+    //             image: 'queen.svg'
+    //         },
+    //         {
+    //             number: 6,
+    //             image: 'bishop.svg'
+    //         },
+    //         {
+    //             number: 7,
+    //             image: 'knight.svg'
+    //         },
+    //         {
+    //             number: 8,
+    //             image: 'rook.svg'
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 2,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 3,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 4,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 5,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 6,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 7,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 8,
+    //             image: 'pawn.svg'
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: null
+    //         },
+    //         {
+    //             number: 2,
+    //             image: null
+    //         },
+    //         {
+    //             number: 3,
+    //             image: null
+    //         },
+    //         {
+    //             number: 4,
+    //             image: null
+    //         },
+    //         {
+    //             number: 5,
+    //             image: null
+    //         },
+    //         {
+    //             number: 6,
+    //             image: null
+    //         },
+    //         {
+    //             number: 7,
+    //             image: null
+    //         },
+    //         {
+    //             number: 8,
+    //             image: null
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: null
+    //         },
+    //         {
+    //             number: 2,
+    //             image: null
+    //         },
+    //         {
+    //             number: 3,
+    //             image: null
+    //         },
+    //         {
+    //             number: 4,
+    //             image: null
+    //         },
+    //         {
+    //             number: 5,
+    //             image: null
+    //         },
+    //         {
+    //             number: 6,
+    //             image: null
+    //         },
+    //         {
+    //             number: 7,
+    //             image: null
+    //         },
+    //         {
+    //             number: 8,
+    //             image: null
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: null
+    //         },
+    //         {
+    //             number: 2,
+    //             image: null
+    //         },
+    //         {
+    //             number: 3,
+    //             image: null
+    //         },
+    //         {
+    //             number: 4,
+    //             image: null
+    //         },
+    //         {
+    //             number: 5,
+    //             image: null
+    //         },
+    //         {
+    //             number: 6,
+    //             image: null
+    //         },
+    //         {
+    //             number: 7,
+    //             image: null
+    //         },
+    //         {
+    //             number: 8,
+    //             image: null
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: null
+    //         },
+    //         {
+    //             number: 2,
+    //             image: null
+    //         },
+    //         {
+    //             number: 3,
+    //             image: null
+    //         },
+    //         {
+    //             number: 4,
+    //             image: null
+    //         },
+    //         {
+    //             number: 5,
+    //             image: null
+    //         },
+    //         {
+    //             number: 6,
+    //             image: null
+    //         },
+    //         {
+    //             number: 7,
+    //             image: null
+    //         },
+    //         {
+    //             number: 8,
+    //             image: null
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 2,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 3,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 4,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 5,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 6,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 7,
+    //             image: 'pawn.svg'
+    //         },
+    //         {
+    //             number: 8,
+    //             image: 'pawn.svg'
+    //         },
+    //     ],
+    //     [
+    //         {
+    //             number: 1,
+    //             image: 'rook.svg'
+    //         },
+    //         {
+    //             number: 2,
+    //             image: 'knight.svg'
+    //         },
+    //         {
+    //             number: 3,
+    //             image: 'bishop.svg'
+    //         },
+    //         {
+    //             number: 4,
+    //             image: 'king.svg'
+    //         },
+    //         {
+    //             number: 5,
+    //             image: 'queen.svg'
+    //         },
+    //         {
+    //             number: 6,
+    //             image: 'bishop.svg'
+    //         },
+    //         {
+    //             number: 7,
+    //             image: 'knight.svg'
+    //         },
+    //         {
+    //             number: 8,
+    //             image: 'rook.svg'
+    //         },
+    //     ]
+    // ],
     over: false,
     moves: 0,
     time: 0,

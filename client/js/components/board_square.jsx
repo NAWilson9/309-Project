@@ -15,13 +15,14 @@ const getStyle = function(props){
         height: (100/props.rowCount) + '%',
         display: 'inline-block',
         backgroundColor: (props.even) ? 'darkgrey' : 'white',
-        textAlign: 'center'
+        textAlign: 'center',
     };
 };
 
 @connect((store) => {
     return {
         moveDestination: store.game.moveDestination,
+        userName: store.user.username
     };
 })
 export default class BoardSquare extends React.Component{
@@ -48,8 +49,18 @@ export default class BoardSquare extends React.Component{
     }
 
     render(){
+        let pieceUser;
+        if(this.props.piece){
+            pieceUser = this.props.piece.player.userData._id.indexOf('generic' + this.props.userName) >= 0;
+        }
+
+        // if(this.props.piece){
+        //     console.log(this.props.piece);
+        //     pieceUser = this.props.piece.player.isBottomPlayer;
+        // }
+
         let image = (this.props.piece !== null)
-            ? <Piece image={this.props.piece.name + '.svg'} row={this.props.rowNumber} cell={this.props.cellNumber}/>
+            ? <Piece image={this.props.piece.name + '.svg'} row={this.props.rowNumber} cell={this.props.cellNumber} isUsers={pieceUser}/>
             : <div style={{paddingTop:'100%'}}/>;
 
         return (
