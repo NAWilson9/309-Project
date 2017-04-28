@@ -33,7 +33,6 @@ export default class BoardSquare extends React.Component{
                 x: this.props.cellNumber,
                 y: this.props.rowNumber,
             },
-            // payload: this.props.rowNumber + ',' + this.props.cellNumber
         });
     }
 
@@ -45,18 +44,18 @@ export default class BoardSquare extends React.Component{
             },
             end: this.props.moveDestination,
         });
-        // payload: this.props.rowNumber + ',' + this.props.cellNumber
     }
 
     render(){
         let pieceUser;
         if(this.props.piece){
-            console.log(this.props.piece);
-            if(this.props.userName){
-                pieceUser = this.props.piece.player.userData._id.indexOf('generic' + this.props.userName) >= 0;
-            } else {
+            // This used to work then the commits that were supposed to actually fix this broke it even more.
+            // if(this.props.userName){
+            //     console.log('username');
+            //     pieceUser = this.props.piece.player.userData._id.indexOf('generic' + this.props.userName) >= 0;
+            // } else {
+                console.log('else');
                 pieceUser = this.props.piece.player.isBottomPlayer;
-            }
         }
 
         let image = (this.props.piece !== null)
