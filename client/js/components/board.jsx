@@ -1,19 +1,12 @@
 import React from 'react';
 import { connect } from "react-redux"
 import BoardRow from './board_row.jsx';
-import { leaveGame } from '../socket.js';
 
 const getStyle = function(over){
     return {
         borderStyle: 'solid',
         borderWidth: '2px',
-        // height: '900px',
-        // width: '100%',
         color: (over) ? 'red' : null
-        // paddingTop: '100%'
-    // width: '800px',
-        // height: '800px',
-        // display: 'inline-block'
     };
 };
 
