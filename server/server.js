@@ -127,8 +127,15 @@ io.on('connection', function (socket) {
                     //Move sockets into room
                     socket.join(roomName);
                     otherSocket.join(roomName);
-                    // Push new game state
-                    io.in(roomName).emit('gameFound', game.getGameState());
+                    // Store and push new game state
+                    let gameState = game.getGameState();
+                    db.createGamestate(gameState, (err) => {
+                        if (err) {
+                            console.error('Error adding game state to db');
+                            console.log(err);
+                        }
+                    });
+                    io.in(roomName).emit('gameFound', gameState);
 
                     //Store new game.
                     activeGames.push(game);
@@ -161,7 +168,14 @@ io.on('connection', function (socket) {
         game.movePiece(movement);
 
         //Todo: Add check for movePiece return value to determine if this emit should happen.
-        io.in(getGameRoomName(socket)).emit('updateGameState', game.getGameState());
+        let gameState = game.getGameState();
+        db.createGamestate(gameState, (err) => {
+            if (err) {
+                console.error('Error adding game state to db');
+                console.log(err);
+            }
+        });
+        io.in(getGameRoomName(socket)).emit('updateGameState', gameState);
     });
 
     //Forwards chat messages to the entire room.
@@ -218,42 +232,4 @@ function leaveQueue(socket){
     });
 
     console.log(new Date().toLocaleTimeString() + ' | A user has been removed from the search queue.');
-}
-
-function getUserDataForSockets(sockets, callback) {
-    let userArr = [];
-    getUserDataForSocketsRecursive(sockets, 0, userArr, callback);
-    return userArr;
-}
-
-function getUserDataForSocketsRecursive(sockets, socketIndex, userArr, callback) {
-    let guid = sockets[socketIndex].guid;
-    if (guid.startsWith('generic')) {
-        userArr.push({
-            username: guid,
-            _id: guid,
-        });
-        if (socketIndex === sockets.length-1) {
-            callback(undefined, null, userArr);
-        } else {
-            getUserDataForSocketsRecursive(sockets, socketIndex + 1, userArr, callback);
-        }
-    } else {
-        db.getUserByID(guid, (err, user) => {
-            if (err) {
-                callback(err, null, undefined);
-            } else {
-                if (user) {
-                    userArr.push(user);
-                    if (socketIndex === sockets.length-1) {
-                        callback(undefined, null, userArr);
-                    } else {
-                        getUserDataForSocketsRecursive(sockets, socketIndex + 1, userArr, callback);
-                    }
-                } else {
-                    callback('UserID ' + guid + ' does not exist.', sockets[socketIndex], null);
-                }
-            }
-        });
-    }
 }

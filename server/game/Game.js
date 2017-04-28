@@ -59,16 +59,16 @@ module.exports.Game = class Game {
                     this.players.playerTop.opponent = this.players.playerBottom;
                     this.players.playerBottom.opponent = this.players.playerTop;
                     this.activePlayer = this.players.playerTop;
+                    this.isClassicGame = gameState ? gameState.isClassicGame : false;
                     if (gameState) {
                         this.gameboard = generateBoardFromGameState(gameState, this);
                     } else {
                         this.gameboard = props.pieceIDs ? undefined : generateClassicBoard(this);
                     }
                     this.nextPlayer = handleNextPlayer;
-                    this._id = new ObjectID().toHexString();
-                    this.isClassicGame = false;
+                    this._id = gameState ? gameState._id : new ObjectID().toHexString();
                     this.movePiece = handleMovePiece;
-                    this.moveCount = 0;
+                    this.moveCount = gameState ? gameState.moveCount : 0;
                     this.getGameState = handleGetGameState;
                     this.latestMovement = gameState ? gameState.movementRequest : {
                         request: null,
@@ -79,9 +79,7 @@ module.exports.Game = class Game {
                 }
             });
         } else {
-            console.error('Must provide either "guids : array," or "gameState : gameState," to constructor');
-        }
-        if (props.gameState) {
+            callback('Must provide either "guids : array," or "gameState : gameState," to constructor');
         }
     }
 };
@@ -359,26 +357,81 @@ function getUserDataForGuidsRecursive(guids, guidIndex, userArr, db, callback) {
         });
     }
 }
-function generateBoardFromGameState(gameState) {
-    for (let rowIndex in gameState.board) {
-        for (let pieceIndex in gameState.board[rowIndex]) {
-            let statePiece = gameState.board[rowIndex][pieceIndex];
-            if (statePiece) {
-                switch (statePiece.name) {
-                    case 'pawn':
-                        board[rowIndex][pieceIndex] = new Pawn({
-                            name: statePiece.name,
-                            consoleName: statePiece.consoleName,
-                            player: null,
-                        });
-                        break;
+function generateBoardFromGameState(gameState, game) {
+    if (gameState.isClassicGame) {
+        for (let rowIndex in gameState.board) {
+            for (let pieceIndex in gameState.board[rowIndex]) {
+                let statePiece = gameState.board[rowIndex][pieceIndex];
+                if (statePiece) {
+                    let piece = generatePieceFromStatePiece(statePiece);
 
+                    board[rowIndex][pieceIndex] = piece;
+                } else {
+                    board[rowIndex][pieceIndex] = null;
                 }
-            } else {
-                board[rowIndex][pieceIndex] = null;
             }
         }
+    } else {
+
     }
+}
+function generatePieceFromStatePiece(statePiece, game) {
+    let player = statePiece.player.isBottomPlayer ? game.players.playerBottom : game.players.playerTop;
+    let piece;
+    switch (statePiece.name) {
+        case 'pawn':
+            piece = new Pawn({
+                name: statePiece.name,
+                consoleName: statePiece.consoleName,
+                player: player,
+            });
+            break;
+        case 'rook':
+            piece = new Rook({
+                name: statePiece.name,
+                consoleName: statePiece.consoleName,
+                player: player,
+            });
+            break;
+        case 'knight':
+            piece = new Knight({
+                name: statePiece.name,
+                consoleName: statePiece.consoleName,
+                player: player,
+            });
+            break;
+        case 'bishop':
+            piece = new Bishop({
+                name: statePiece.name,
+                consoleName: statePiece.consoleName,
+                player: player,
+            });
+            break;
+        case 'queen':
+            piece = new Queen({
+                name: statePiece.name,
+                consoleName: statePiece.consoleName,
+                player: player,
+            });
+            break;
+        case 'king':
+            piece = new King({
+                name: statePiece.name,
+                consoleName: statePiece.consoleName,
+                player: player,
+            });
+            break;
+        default :
+            piece = null;
+            break;
+    }
+    piece.board = game.gameboard;
+    piece.isInPlay = statePiece.isInPlay;
+    piece.currentLocation = statePiece.currentLocation;
+    piece.player.pieces.push(piece);
+    // Should generalize from King
+    if (piece instanceof King) piece.player.king = piece;
+    return piece;
 }
 function generateClassicBoard(game) {
     game.isClassicGame = true;

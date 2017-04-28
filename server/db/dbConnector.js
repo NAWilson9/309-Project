@@ -53,18 +53,18 @@ const dbSchemas = {
         userID: Joi.string().required(),
         _id: Joi.string().optional(),
     }),
-    gamestate: Joi.object().keys({
-        players: Joi.array().items(
-            Joi.string()
-        ).required(),
-        winner: Joi.string().required(),
-        board: Joi.array().items(
-            Joi.array().items(
-                Joi.object()
-            )
-        ).required(),
-        _id: Joi.string().optional(),
-    }),
+    gamestate: Joi.object(),
+        // players: Joi.array().items(
+        //     Joi.string()
+        // ).required(),
+        // winner: Joi.string().required(),
+        // gameboard: Joi.array().items(
+        //     Joi.array().items(
+        //         Joi.object()
+        //     )
+        // ).required(),
+        // _id: Joi.string().optional(),
+
 };
 
 /**
