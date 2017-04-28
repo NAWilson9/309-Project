@@ -1,5 +1,4 @@
 export default function reducer(state={
-    //Todo: Get rid of the junk
     players: [],
     board: [
         [
@@ -278,10 +277,13 @@ export default function reducer(state={
     over: false,
     moves: 0,
     time: 0,
+    players: null,
+    activePlayer: null,
     moveDestination: null,
     moveStartPosition: null,
     inGame: false,
-    inQueue: false
+    inQueue: false,
+    gamesInProgress: []
 }, action) {
 
     switch (action.type) {
@@ -312,7 +314,11 @@ export default function reducer(state={
         }
         case 'updateGameState': {
             const gameState = action.payload;
-            return {...state, board: gameState.board }
+            console.log(gameState.players);
+            return {...state, board: gameState.board, players: gameState.players, activePlayer: gameState.activePlayer, moves: gameState.moveCount }
+        }
+        case 'currentGames': {
+            return {...state, gamesInProgress: action.payload}
         }
         default: {
             return state

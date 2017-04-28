@@ -8,6 +8,7 @@ import CHSSHeader from './header.jsx';
 import LoginView from './login_view.jsx';
 import ProfileView from './profile_view.jsx';
 import HomeView from './home_view.jsx';
+import Spectate from "./spectate.jsx";
 
 @connect((store) => {
     return {
@@ -29,6 +30,8 @@ export default class Page extends React.Component{
             case 'profile':
                 if (this.props.loggedIn) return <ProfileView/>;
                 else return <LoginView/>;
+          case 'watch':
+                return <Spectate/>;
             default:
                 return <h1 style={{textAlign: 'center'}}>{this.props.view} page in progress...</h1>;
         }
