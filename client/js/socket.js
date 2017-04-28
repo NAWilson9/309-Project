@@ -55,6 +55,8 @@ socket.on('gameFound', function(gameState){
         type: 'gameFound',
         payload: null
     });
+
+    console.log(gameState);
     store.dispatch({
         type: 'updateGameState',
         payload: gameState
@@ -79,5 +81,12 @@ socket.on('chatMessage', function(message){
     store.dispatch({
         type: 'chatMessage',
         payload: message
+    });
+});
+
+socket.on('currentGames', function(games){
+    store.dispatch({
+      type: 'currentGames',
+      payload: games
     });
 });

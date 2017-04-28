@@ -32,7 +32,6 @@ export default class Board extends React.Component{
                         return <BoardRow key={i} rowNumber={i} rowData={row} numberOfRows={this.props.board.length} even={i%2 == 0}/>
                     }, this)
                 }</div>
-                <button onClick={() => leaveGame()}/>
             </div>
         );
     }

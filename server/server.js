@@ -90,6 +90,7 @@ function keyGen(){
 //Socket routing
 io.on('connection', function (socket) {
     console.log(new Date().toLocaleTimeString() + ' | A user has connected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
+    socket.emit('currentGames', getCurrentGames());
 
     //Used to find a game for a user.
     //If there is nobody else looking for a game, places user in queue.
@@ -233,3 +234,55 @@ function leaveQueue(socket){
 
     console.log(new Date().toLocaleTimeString() + ' | A user has been removed from the search queue.');
 }
+
+function getUserDataForSockets(sockets, callback) {
+    let userArr = [];
+    getUserDataForSocketsRecursive(sockets, 0, userArr, callback);
+    return userArr;
+}
+
+function getUserDataForSocketsRecursive(sockets, socketIndex, userArr, callback) {
+    let guid = sockets[socketIndex].guid;
+    if (guid.startsWith('generic')) {
+        userArr.push({
+            username: guid,
+            _id: guid,
+        });
+        if (socketIndex === sockets.length-1) {
+            callback(undefined, null, userArr);
+        } else {
+            getUserDataForSocketsRecursive(sockets, socketIndex + 1, userArr, callback);
+        }
+    } else {
+        db.getUserByID(guid, (err, user) => {
+            if (err) {
+                callback(err, null, undefined);
+            } else {
+                if (user) {
+                    userArr.push(user);
+                    if (socketIndex === sockets.length-1) {
+                        callback(undefined, null, userArr);
+                    } else {
+                        getUserDataForSocketsRecursive(sockets, socketIndex + 1, userArr, callback);
+                    }
+                } else {
+                    callback('UserID ' + guid + ' does not exist.', sockets[socketIndex], null);
+                }
+            }
+        });
+    }
+}
+
+function getCurrentGames(){
+    return activeGames.map(function(game){
+        return {
+            'playerTop': game.players.playerTop.userData._id,
+            'playerBottom': game.players.playerBottom.userData._id,
+            'moveCount': game.moveCount
+        };
+    });
+}
+
+setInterval(function(){
+    io.sockets.emit('currentGames', getCurrentGames());
+}, 5000);

@@ -22,21 +22,21 @@ const getStyle = function(props){
 @connect((store) => {
     return {
         moveDestination: store.game.moveDestination,
+        userName: store.user.username
     };
 })
 export default class BoardSquare extends React.Component{
-    dragEnterHandler(ev){
+    dragEnterHandler(){
         this.props.dispatch({
             type: "pieceMoveDestination",
             payload: {
                 x: this.props.cellNumber,
                 y: this.props.rowNumber,
             },
-            // payload: this.props.rowNumber + ',' + this.props.cellNumber
         });
     }
 
-    onDragEnd(ev){
+    onDragEnd(){
         movePiece({
             start: {
                 x: this.props.cellNumber,
@@ -44,12 +44,22 @@ export default class BoardSquare extends React.Component{
             },
             end: this.props.moveDestination,
         });
-        // payload: this.props.rowNumber + ',' + this.props.cellNumber
     }
 
     render(){
+        let pieceUser;
+        if(this.props.piece){
+            // This used to work then the commits that were supposed to actually fix this broke it even more.
+            // if(this.props.userName){
+            //     console.log('username');
+            //     pieceUser = this.props.piece.player.userData._id.indexOf('generic' + this.props.userName) >= 0;
+            // } else {
+                console.log('else');
+                pieceUser = this.props.piece.player.isBottomPlayer;
+        }
+
         let image = (this.props.piece !== null)
-            ? <Piece image={this.props.piece.name + '.svg'} row={this.props.rowNumber} cell={this.props.cellNumber}/>
+            ? <Piece image={this.props.piece.name + '.svg'} row={this.props.rowNumber} cell={this.props.cellNumber} isUsers={pieceUser}/>
             : <div style={{paddingTop:'100%'}}/>;
 
         return (
