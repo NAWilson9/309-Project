@@ -90,6 +90,7 @@ function keyGen(){
 //Socket routing
 io.on('connection', function (socket) {
     console.log(new Date().toLocaleTimeString() + ' | A user has connected. | IP Address: ' + socket.handshake.address +  ' | Total users: ' + io.engine.clientsCount);
+    socket.emit('currentGames', getCurrentGames());
 
     //Used to find a game for a user.
     //If there is nobody else looking for a game, places user in queue.
@@ -233,3 +234,17 @@ function leaveQueue(socket){
 
     console.log(new Date().toLocaleTimeString() + ' | A user has been removed from the search queue.');
 }
+
+function getCurrentGames(){
+    return activeGames.map(function(game){
+        return {
+            'playerTop': game.players.playerTop.userData._id,
+            'playerBottom': game.players.playerBottom.userData._id,
+            'moveCount': game.moveCount
+        };
+    });
+}
+
+setInterval(function(){
+    io.sockets.emit('currentGames', getCurrentGames());
+}, 5000);
