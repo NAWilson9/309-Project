@@ -36,6 +36,13 @@ export default class CHSSHeader extends React.Component {
                     onClick={() => this.changePage('game')}
                 />
                 <Menu.Item
+                    active={this.props.currentPage === 'watch'}
+                    color='green'
+                    icon='play'
+                    name='Watch'
+                    onClick={() => this.changePage('watch')}
+                />
+                <Menu.Item
                     active={this.props.currentPage === 'editor'}
                     color='green'
                     icon='write'
