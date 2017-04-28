@@ -30,7 +30,7 @@ export function login(username, password, callback){
                 type: 'login',
                 payload: body,
             });
-        } else /*if (response.statusCode === 401)*/ {
+        } else {
             callback();
         }
     });
@@ -48,7 +48,7 @@ export function register(username, password, callback){
                 type: 'login',
                 payload: body,
             });
-        } else /*if(response.statusCode === 400)*/ {
+        } else {
             callback();
         }
     });
