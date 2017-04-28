@@ -227,7 +227,7 @@ function leaveGame(socket){
 }
 
 //Used to remove a user from the search queue.
-function leaveQueue(socket){
+function leaveQueue(socket) {
     usersInQueue = usersInQueue.filter(function (user) {
         return user !== socket;
     });
