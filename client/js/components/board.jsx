@@ -20,14 +20,14 @@ const getStyle = function(over){
 @connect((store) => {
     return {
         board: store.game.board,
-        over: store.game.over
+        winner: store.game.winner
     };
 })
 export default class Board extends React.Component{
     render() {
         return (
             <div>
-                <div style={getStyle(this.props.over)}>{
+                <div style={getStyle(this.props.winner)}>{
                     this.props.board.map(function(row, i){
                         return <BoardRow key={i} rowNumber={i} rowData={row} numberOfRows={this.props.board.length} even={i%2 == 0}/>
                     }, this)

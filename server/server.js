@@ -102,6 +102,7 @@ io.on('connection', function (socket) {
     //an optional callback that is called without arguments
     //when a user is placed into the queue.
     socket.on('findGame', function(guid, callback){
+        if(callback) callback();
         //Store easily identifiable guid on socket object.
         socket.guid = guid; //Todo
         if(usersInQueue.length > 0) {
@@ -146,7 +147,6 @@ io.on('connection', function (socket) {
             });
         } else {
             usersInQueue.push(socket);
-            if(callback) callback();
 
             console.log(new Date().toLocaleTimeString() + ' | A user has been added to the search queue.');
         }

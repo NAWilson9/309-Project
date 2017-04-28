@@ -5,6 +5,11 @@ module.exports.GameState = class GameState {
     constructor(game) {
         this.players = generateGameStatePlayers(game.players);
         this.activePlayer = game.players.playerTop === game.activePlayer ? this.players.playerTop : this.players.playerBottom;
+        this.winner = null;
+        if (game.winner) {
+            if (game.winner === game.playerTop) this.winner = this.players.playerTop;
+            else this.winner = this.players.playerBottom;
+        }
         this.board = generateGameStateBoard(game.gameboard, this.players);
         this.moveCount = game.moveCount;
         this.isClassicGame = game.isClassicGame;

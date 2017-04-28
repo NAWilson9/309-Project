@@ -75,6 +75,7 @@ module.exports.Game = class Game {
                         successful: null,
                         errMsg: null,
                     };
+                    this.winner = null;
                     callback(null, this);
                 }
             });
@@ -140,6 +141,8 @@ const handleMovePiece = function(movement) {
                 // console.log('Piece:', piece);
                 // console.log('DestPiece:', destinationPiece);
                 updateCheckAndCheckmate(this.players);
+                if (!this.players.playerTop.king.isInPlay) this.winner = this.players.playerBottom;
+                else if (!this.players.playerBottom.king.isInPlay) this.winner = this.players.playerTop;
                 // console.log('Check:', this.activePlayer.isInCheck, this.nextPlayer().isInCheck);
                 // console.log('Checkmate:', this.activePlayer.isInCheckmate, this.nextPlayer().isInCheckmate);
                 this.activePlayer = this.nextPlayer();

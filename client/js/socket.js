@@ -21,14 +21,13 @@ export function findGame(){
         }
         return key;
     }
-
     let guid = store.getState().user._id || keyGen();
     socket.emit('findGame', guid, function(){
         // This callback is used to prevent the loading elements from
         // flickering on the screen before the game board loads.
         store.dispatch({
             type: 'findGame',
-            payload: null,
+            payload: guid,
         });
     });
 }
@@ -56,7 +55,7 @@ socket.on('gameFound', function(gameState){
         payload: null
     });
 
-    console.log(gameState);
+    // console.log(gameState);
     store.dispatch({
         type: 'updateGameState',
         payload: gameState

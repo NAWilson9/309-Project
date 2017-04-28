@@ -279,6 +279,7 @@ export default function reducer(state={
     time: 0,
     players: null,
     activePlayer: null,
+    winner: null,
     moveDestination: null,
     moveStartPosition: null,
     inGame: false,
@@ -314,8 +315,8 @@ export default function reducer(state={
         }
         case 'updateGameState': {
             const gameState = action.payload;
-            console.log(gameState.players);
-            return {...state, board: gameState.board, players: gameState.players, activePlayer: gameState.activePlayer, moves: gameState.moveCount }
+            // console.log(gameState.players);
+            return {...state, board: gameState.board, players: gameState.players, activePlayer: gameState.activePlayer, winner: gameState.winner, moves: gameState.moveCount }
         }
         case 'currentGames': {
             return {...state, gamesInProgress: action.payload}

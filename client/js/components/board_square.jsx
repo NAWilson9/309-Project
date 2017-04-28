@@ -21,29 +21,36 @@ const getStyle = function(props){
 
 @connect((store) => {
     return {
+        activePlayer: store.game.activePlayer,
         moveDestination: store.game.moveDestination,
-        userName: store.user.username
+        winner: store.game.winner,
+        userName: store.user.username,
+        _id: store.user._id,
     };
 })
 export default class BoardSquare extends React.Component{
     dragEnterHandler(){
-        this.props.dispatch({
-            type: "pieceMoveDestination",
-            payload: {
-                x: this.props.cellNumber,
-                y: this.props.rowNumber,
-            },
-        });
+        if (!this.props.winner && this.props._id === this.props.activePlayer.userData._id) {
+            this.props.dispatch({
+                type: "pieceMoveDestination",
+                payload: {
+                    x: this.props.cellNumber,
+                    y: this.props.rowNumber,
+                },
+            });
+        }
     }
 
     onDragEnd(){
-        movePiece({
-            start: {
-                x: this.props.cellNumber,
-                y: this.props.rowNumber,
-            },
-            end: this.props.moveDestination,
-        });
+        if (!this.props.winner && this.props.piece && this.props._id === this.props.activePlayer.userData._id) {
+            movePiece({
+                start: {
+                    x: this.props.cellNumber,
+                    y: this.props.rowNumber,
+                },
+                end: this.props.moveDestination,
+            });
+        }
     }
 
     render(){
