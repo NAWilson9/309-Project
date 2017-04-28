@@ -69,7 +69,6 @@ socket.on('playerLeft', function() {
 });
 
 socket.on('updateGameState', function(gameState) {
-    console.log(gameState);
     store.dispatch({
         type: 'updateGameState',
         payload: gameState
