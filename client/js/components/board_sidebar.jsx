@@ -42,13 +42,6 @@ const BoardRow = React.createClass({
                     </Accordion.Content>
                     <Accordion.Title>
                         <Icon name='dropdown' />
-                        Opponent Info
-                    </Accordion.Title>
-                    <Accordion.Content>
-
-                    </Accordion.Content>
-                    <Accordion.Title>
-                        <Icon name='dropdown' />
                         Match Chat
                         {true == true && <Icon name='comment'/>}
                     </Accordion.Title>
