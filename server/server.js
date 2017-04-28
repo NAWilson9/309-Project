@@ -103,15 +103,18 @@ io.on('connection', function (socket) {
     socket.on('findGame', function(guid, callback){
         //Store easily identifiable guid on socket object.
         socket.guid = guid; //Todo
-        if(usersInQueue.length > 0){
+        if(usersInQueue.length > 0) {
             //Create and fetch data.
             let otherSocket = usersInQueue.shift();
             let roomName = createRoomID();
 
-            getUserDataForSockets([
-                socket,
-                otherSocket,
-            ], (err, errSocket, users) => {
+            new Game({
+                db: db,
+                guids: [
+                    socket.guid,
+                    otherSocket.guid,
+                ],
+            }, (err, game) => {
                 if (err) {
                     // emit error? todo
                     if (errSocket) {
@@ -121,17 +124,14 @@ io.on('connection', function (socket) {
                     }
                     console.error(err);
                 } else {
-                    let newGame = new Game({
-                        users: users,
-                    });
                     //Move sockets into room
                     socket.join(roomName);
                     otherSocket.join(roomName);
                     // Push new game state
-                    io.in(roomName).emit('gameFound', newGame.getGameState());
+                    io.in(roomName).emit('gameFound', game.getGameState());
 
                     //Store new game.
-                    activeGames.push(newGame);
+                    activeGames.push(game);
 
                     console.log(new Date().toLocaleTimeString() + ' | A new game has been started.');
                 }

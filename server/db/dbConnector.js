@@ -95,6 +95,11 @@ const dbRespond = (callback, err, res) => {
     }
 };
 
+const formatItem = (item) => {
+    item._id = item._id.toHexString();
+    return item;
+};
+
 /**
  * Error messages
  * @private
@@ -130,7 +135,7 @@ const createItem = (item, itemSchema, collectionName, callback) => {
         let coll = db.collection(collectionName);
         coll.insertOne(item)
             .then(
-                (res) => dbRespond(callback, undefined, res.ops[0]),
+                (res) => dbRespond(callback, undefined, formatItem(res.ops[0])),
                 (err) => dbRespond(callback, err)
             );
     }
@@ -162,7 +167,7 @@ const getItemByKeyValue = (keyValuePair, collectionName, callback) => {
         let coll = db.collection(collectionName);
         coll.findOne(keyValuePair)
             .then(
-                (res) => dbRespond(callback, undefined, res),
+                (res) => dbRespond(callback, undefined, formatItem(res)),
                 (err) => dbRespond(callback, err)
             );
     } else dbRespond(callback, dbErrMsg.noQueryData);
@@ -219,7 +224,7 @@ const getItemsByUserID = (userID, collectionName, callback) => {
         coll.find({userID: userID})
             .toArray()
             .then(
-                (res) => dbRespond(callback, undefined, res),
+                (res) => dbRespond(callback, undefined, formatItem(res)),
                 (err) => dbRespond(callback, err)
             );
     } else dbRespond(callback, dbErrMsg.noQueryData);
@@ -252,7 +257,7 @@ const updateItem = (item, itemSchema, collectionName, callback) => {
         }
         coll.findOneAndReplace({ _id: newItem._id }, newItem, { returnOriginal: false })
             .then(
-                (res) => dbRespond(callback, undefined, res.value),
+                (res) => dbRespond(callback, undefined, formatItem(res.value)),
                 (err) => dbRespond(callback, err)
             );
     }
@@ -284,7 +289,7 @@ const deleteItemByKeyValue = (keyValuePair, collectionName, callback) => {
         let coll = db.collection(collectionName);
         coll.findOneAndDelete(keyValuePair)
             .then(
-                (res) => dbRespond(callback, undefined, res.value),
+                (res) => dbRespond(callback, undefined, formatItem(res.value)),
                 (err) => dbRespond(callback, err)
             );
     } else dbRespond(callback, dbErrMsg.noQueryData);

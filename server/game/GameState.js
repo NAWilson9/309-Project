@@ -7,9 +7,11 @@ module.exports.GameState = class GameState {
         this.activePlayer = game.players.playerTop === game.activePlayer ? this.players.playerTop : this.players.playerBottom;
         this.board = generateGameStateBoard(game.gameboard, this.players);
         this.moveCount = game.moveCount;
+        this.isClassicGame = game.isClassicGame;
         this.movementRequest = Object.assign({}, game.latestMovement);
+        this.gameID = game._id;
     }
-}
+};
 
 
 function generateGameStatePlayers(players) {

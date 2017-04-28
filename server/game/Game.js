@@ -9,37 +9,80 @@ const King = require('./Piece').King;
 const Bishop = require('./Piece').Bishop;
 const Pawn = require('./Piece').Pawn;
 const GameState = require('./GameState').GameState;
+const ObjectID = require('mongodb').ObjectID;
 
 module.exports.Game = class Game {
-    constructor(props) {
-        let players = [];
-        for (let userIndex = 0; userIndex < props.users.length; userIndex++) {
-            let user = props.users[userIndex];
-            if (user.username.startsWith('generic')) {
-                user.username = (userIndex === 0 ? 'Top' : 'Bottom') + ' player';
+    constructor(props, callback) {
+        let gameState = props.gameState;
+        let guids = [];
+        if (props.guids) guids = props.guids;
+        else if (gameState) {
+            for (let playerIndex in gameState.players) {
+                guids.push(gameState.players[playerIndex]._id);
             }
-            players.push(new Player({
-                userData: user,
-                isBottomPlayer: userIndex !== 0,
-            }));
         }
-        this.players = {
-            playerTop: players[0],
-            playerBottom: players[1],
-        };
-        this.players.playerTop.opponent = this.players.playerBottom;
-        this.players.playerBottom.opponent = this.players.playerTop;
-        this.activePlayer = this.players.playerTop;
-        this.nextPlayer = handleNextPlayer;
-        this.gameboard = props.pieceIDs ? null : generateClassicBoard(this);
-        this.movePiece = handleMovePiece;
-        this.moveCount = 0;
-        this.getGameState = handleGetGameState;
-        this.latestMovement = {
-            request: null,
-            successful: null,
-            errMsg: null,
-        };
+        if (guids) {
+            getUserDataForGuids(props.guids, props.db, (err, errGuid, users) => {
+                if (err) {
+                    callback(err);
+                } else {
+                    let players = [];
+                    for (let userIndex = 0; userIndex < users.length; userIndex++) {
+                        let user = users[userIndex];
+                        if (user.username.startsWith('generic')) {
+                            user.username = (userIndex === 0 ? 'Top' : 'Bottom') + ' player';
+                        }
+                        players.push(new Player({
+                            userData: user,
+                            isBottomPlayer: userIndex !== 0,
+                        }));
+                    }
+                    if (gameState) {
+                        let playerTop, playerBottom;
+                        if (players[0].userData._id === gameState.players.playerTop._id) {
+                            playerTop = players[0];
+                            playerBottom = players[1];
+                        } else {
+                            playerTop = players[1];
+                            playerBottom = players[0];
+                        }
+                        this.players = {
+                            playerTop: playerTop,
+                            playerBottom: playerBottom,
+                        };
+                    } else {
+                        this.players = {
+                            playerTop: players[0],
+                            playerBottom: players[1],
+                        };
+                    }
+                    this.players.playerTop.opponent = this.players.playerBottom;
+                    this.players.playerBottom.opponent = this.players.playerTop;
+                    this.activePlayer = this.players.playerTop;
+                    if (gameState) {
+                        this.gameboard = generateBoardFromGameState(gameState, this);
+                    } else {
+                        this.gameboard = props.pieceIDs ? undefined : generateClassicBoard(this);
+                    }
+                    this.nextPlayer = handleNextPlayer;
+                    this._id = new ObjectID().toHexString();
+                    this.isClassicGame = false;
+                    this.movePiece = handleMovePiece;
+                    this.moveCount = 0;
+                    this.getGameState = handleGetGameState;
+                    this.latestMovement = gameState ? gameState.movementRequest : {
+                        request: null,
+                        successful: null,
+                        errMsg: null,
+                    };
+                    callback(null, this);
+                }
+            });
+        } else {
+            console.error('Must provide either "guids : array," or "gameState : gameState," to constructor');
+        }
+        if (props.gameState) {
+        }
     }
 };
 
@@ -279,8 +322,66 @@ function containsLocation(destinations, location) {
     }
     return false;
 }
+function getUserDataForGuids(guids, db, callback) {
+    let userArr = [];
+    getUserDataForGuidsRecursive(guids, 0, userArr, db, callback);
+    return userArr;
+}
 
+function getUserDataForGuidsRecursive(guids, guidIndex, userArr, db, callback) {
+    let guid = guids[guidIndex];
+    if (guid.startsWith('generic')) {
+        userArr.push({
+            username: guid,
+            _id: guid,
+        });
+        if (guidIndex === guids.length-1) {
+            callback(undefined, null, userArr);
+        } else {
+            getUserDataForGuidsRecursive(guids, guidIndex + 1, userArr, db, callback);
+        }
+    } else {
+        db.getUserByID(guid, (err, user) => {
+            if (err) {
+                callback(err, null, undefined);
+            } else {
+                if (user) {
+                    userArr.push(user);
+                    if (guidIndex === guids.length-1) {
+                        callback(undefined, null, userArr);
+                    } else {
+                        getUserDataForGuidsRecursive(guids, guidIndex + 1, userArr, db, callback);
+                    }
+                } else {
+                    callback('UserID ' + guid + ' does not exist.', guids[guidIndex], null);
+                }
+            }
+        });
+    }
+}
+function generateBoardFromGameState(gameState) {
+    for (let rowIndex in gameState.board) {
+        for (let pieceIndex in gameState.board[rowIndex]) {
+            let statePiece = gameState.board[rowIndex][pieceIndex];
+            if (statePiece) {
+                switch (statePiece.name) {
+                    case 'pawn':
+                        board[rowIndex][pieceIndex] = new Pawn({
+                            name: statePiece.name,
+                            consoleName: statePiece.consoleName,
+                            player: null,
+                        });
+                        break;
+
+                }
+            } else {
+                board[rowIndex][pieceIndex] = null;
+            }
+        }
+    }
+}
 function generateClassicBoard(game) {
+    game.isClassicGame = true;
     let board = [
         [
             new Rook({
